@@ -1,0 +1,1269 @@
+<?xml version="1.0" encoding="US-ASCII"?>
+<!-- edited with XMLSPY v5 rel. 3 U (http://www.xmlspy.com)
+     by Daniel M Kohn (private) -->
+<!DOCTYPE rfc SYSTEM "rfc2629.dtd" [
+<!ENTITY rfc2119 PUBLIC "" "http://xml.resource.org/public/rfc/bibxml/reference.RFC.2119.xml">
+]>
+<rfc category="info"
+     docName="draft-wu-model-driven-management-virtualization-06"
+     ipr="trust200902">
+  <?xml-stylesheet type='text/xsl' href='rfc2629.xslt' ?>
+
+  <?rfc toc="yes" ?>
+
+  <?rfc symrefs="yes" ?>
+
+  <?rfc sortrefs="yes"?>
+
+  <?rfc iprnotified="no" ?>
+
+  <?rfc strict="yes" ?>
+
+  <front>
+    <title abbrev="Service and Network Management Automation">A Framework for
+    Automating Service and Network Management with YANG</title>
+
+    <author fullname="Qin Wu" initials="Q." surname="Wu">
+      <organization>Huawei</organization>
+
+      <address>
+        <postal>
+          <street>101 Software Avenue, Yuhua District</street>
+
+          <city>Nanjing</city>
+
+          <region>Jiangsu</region>
+
+          <code>210012</code>
+
+          <country>China</country>
+        </postal>
+
+        <email>bill.wu@huawei.com</email>
+      </address>
+    </author>
+
+    <author fullname="Mohamed Boucadair" initials="M." surname="Boucadair">
+      <organization>Orange</organization>
+
+      <address>
+        <postal>
+          <street>Rennes 35000</street>
+
+          <country>France</country>
+        </postal>
+
+        <email>mohamed.boucadair@orange.com</email>
+      </address>
+    </author>
+
+    <author fullname="Christian" initials="C." surname="Jacquenet">
+      <organization>Orange</organization>
+
+      <address>
+        <postal>
+          <street>Rennes 35000</street>
+
+          <country>France</country>
+        </postal>
+
+        <email>christian.jacquenet@orange.com</email>
+      </address>
+    </author>
+
+    <author fullname="Luis Miguel Contreras Murillo" initials="L."
+            surname="Miguel Contreras Murillo">
+      <organization>Telifonica</organization>
+
+      <address>
+        <email>luismiguel.contrerasmurillo@telefonica.com</email>
+      </address>
+    </author>
+
+    <author fullname="Diego R. Lopez " initials="D" surname="Lopez">
+      <organization>Telefonica I+D</organization>
+
+      <address>
+        <postal>
+          <street/>
+
+          <city/>
+
+          <region/>
+
+          <code/>
+
+          <country>Spain</country>
+        </postal>
+
+        <email>diego.r.lopez@telefonica.com</email>
+      </address>
+    </author>
+
+    <author fullname="Chongfeng Xie" initials="C" surname="Xie">
+      <organization>China Telecom</organization>
+
+      <address>
+        <postal>
+          <street/>
+
+          <city>Beijing</city>
+
+          <country>China</country>
+        </postal>
+
+        <email>xiechf.bri@chinatelecom.cn</email>
+      </address>
+    </author>
+
+    <author fullname="Weiqiang Cheng" initials="W." surname="Cheng">
+      <organization>China Mobile</organization>
+
+      <address>
+        <email>chengweiqiang@chinamobile.com</email>
+      </address>
+    </author>
+
+    <author fullname="Liang Geng" initials="L." surname="Geng">
+      <organization>China Mobile</organization>
+
+      <address>
+        <email>gengliang@chinamobile.com</email>
+      </address>
+    </author>
+
+    <author fullname="Young Lee" initials="Y." surname="Lee">
+      <organization>Futurewei</organization>
+
+      <address>
+        <email>younglee.tx@gmail.com</email>
+      </address>
+    </author>
+
+    <date year="2019"/>
+
+    <area>OPS Area</area>
+
+    <workgroup>Networking Working Group</workgroup>
+
+    <keyword>RFC</keyword>
+
+    <keyword>Request for Comments</keyword>
+
+    <keyword>I-D</keyword>
+
+    <keyword>Internet-Draft</keyword>
+
+    <keyword>Model Driven, YANG Data Model</keyword>
+
+    <abstract>
+      <t>Data models for service and network management provides a
+      programmatic approach for representing (virtual) services or networks
+      and deriving configuration information that will be forwarded to network
+      and service components that are used to build and deliver the service.
+      Data Models can be used during various phases of the service and network
+      management life cycle, such as service instantiation, service
+      provisioning, optimization, monitoring, and diagnostic. Also, data
+      models are are instrumental in the automation of network management.
+      They also provide closed-loop control for the sake of adaptive and
+      deterministic service creation, delivery, and maintenance.</t>
+
+      <t>This document provides a framework that describes and discusses an
+      architecture for service and network management automation that takes
+      advantage of YANG modeling technologies. This framework is drawn from a
+      network provider perspective irrespective of the origin of a data module
+      andcan accommodate even modules that are developed outside the IETF.</t>
+
+      <t>The document aims to exemplify an approach that specifies the journey
+      from technology-agnostic services to technology-specific actions.</t>
+    </abstract>
+  </front>
+
+  <middle>
+    <section anchor="intro" title="Introduction">
+      <t>The service management system usually comprises service activation/
+      provision and service operation. Current service delivery procedures,
+      from the processing of customer's requirements and order to service
+      delivery and operation, typically assume the manipulation of data
+      sequentially into multiple OSS/BSS applications that may be managed by
+      different departments within the service provider's organization (e.g.,
+      billing factory, design factory, network operation center, etc.). In
+      addition, many of these applications have been developed in-house over
+      the years and operating in a silo mode. The lack of standard data
+      input/output (i.e., data model) also raises many challenges in system
+      integration and often results in manual configuration tasks. Secondly,
+      many current service fulfillment might not support real time streaming
+      telemetry capability in high frequency and in high throughput on the
+      current state of networking and therefore have slow response to the
+      network changes. Software Defined Networking (SDN) becomes crucial to
+      address these challenges.</t>
+
+      <t>Software-Defined Networking techniques <xref target="RFC7149"/> are
+      meant to automate the overall service delivery procedures and typically
+      rely upon (standard) data models that are used to not only reflect
+      service providers'savoir-faire but also to dynamically instantiate and
+      enforce a set of (service-inferred) policies that best accommodate what
+      has been (contractually) defined (and possibly negotiated) with the
+      customer. <xref target="RFC7149"/> provides a first tentative to
+      rationalize that service provider's view on the SDN space by identifying
+      concrete technical domains that need to be considered and for which
+      solutions can be provided: <list style="symbols">
+          <t>Techniques for the dynamic discovery of topology, devices, and
+          capabilities, along with relevant information and data models that
+          are meant to precisely document such topology, devices, and their
+          capabilities.</t>
+
+          <t>Techniques for exposing network services <xref target="RFC8309"/>
+          and their characteristics.</t>
+
+          <t>Techniques used by service-requirement-derived dynamic resource
+          allocation and policy enforcement schemes, so that networks can be
+          programmed accordingly.</t>
+
+          <t>Dynamic feedback mechanisms that are meant to assess how
+          efficiently a given policy (or a set thereof) is enforced from a
+          service fulfillment and assurance perspective.</t>
+        </list></t>
+
+      <t>Models are key for each of these technical items. Service and network
+      management automation is an important step to improve the agility of
+      network operations and infrastructures.</t>
+
+      <t>YANG module developers have taken both top-down and bottom-up
+      approaches to develop modules [RFC8199] and to establish a mapping
+      between network technology and customer requirements on the top or
+      abstracting common construct from various network technologies on the
+      bottom. At the time of writing this document (2019), there are many data
+      models including configuration and service models that have been
+      specified or are being specified by the IETF. They cover many of the
+      networking protocols and techniques. However, how these models work
+      together to configure a device, manage a set of devices involved in a
+      service, or even provide a service is something that is not currently
+      documented either within the IETF or other SDOs (e.g., MEF).</t>
+
+      <t>This document provides a framework that describes and discusses an
+      architecture for service and network management automation that takes
+      advantage of YANG modeling technologies and investigates how different
+      layer YANG data models interact with each other (e.g., service mapping,
+      model composing) in the context of service delivery and fulfillment.
+      This framework is drawn from a network provider perspective irrespective
+      of the origin of a data module andcan accommodate even modules that are
+      developed outside the IETF.</t>
+
+      <t>The document also identifies a list of use cases to exemplify the
+      proposed approach, but it does not claim to be exhaustive.</t>
+
+      <t>It is not the intent of this document to provide an inventory of
+      tools and mechanisms used in specific network and service management
+      domains; such inventory can be found in documents such as <xref
+      target="RFC7276"/>.</t>
+
+      <section title="Terminology">
+        <t>The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+        "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+        "OPTIONAL" in this document are to be interpreted as described in BCP
+        14 [RFC2119] [RFC8174] when, and only when, they appear in all
+        capitals, as shown here.</t>
+
+        <t>The following terms are defined in [RFC8309][RFC8199] and are not
+        redefined here:<list style="symbols">
+            <t>Network Operator</t>
+
+            <t>Customer</t>
+
+            <t>Service</t>
+
+            <t>Data Model</t>
+
+            <t>Service Model</t>
+
+            <t>Network Element Module</t>
+          </list></t>
+
+        <t>The following terms are defined in this document as follows: <list
+            style="hanging">
+            <t hangText="Network Model:">The Network Resource Module is used
+            by a network operator to allocate the resource(e.g., tunnel
+            resource, topology resource) for the service or schedule the
+            resource to meet the service requirements define in the Service
+            Model.</t>
+
+            <t hangText="Device Model:">Network Element YANG data module
+            described in [RFC8199].</t>
+          </list></t>
+      </section>
+    </section>
+
+    <section title="Architectural Concepts">
+      <section title="Data Models: Layering and Representation">
+        <t>As described in <xref target="RFC8199"/>, layering of modules
+        allows for better reusability of lower-layer modules by higher-level
+        modules while limiting duplication of features across layers.</t>
+
+        <t>The data modules developed by IETF can be classified into service
+        level, network level and device level modules. Different service level
+        modules may rely on the same set of network level or device level
+        modules. Service level modules usually follow top down approach and
+        are mostly customer-facing modules providing a common model construct
+        for higher level network services, which can be further mapped to
+        network technology-specific modules at lower layer.</t>
+
+        <t>Network level modules mostly follow a bottom-up approach and are
+        mainly network resource-facing modules and describe various aspects of
+        a network infrastructure, including devices and their subsystems, and
+        relevant protocols operating at the link and network layers across
+        multiple devices (e.g., Network topology and TE Tunnel modules).</t>
+
+        <t>Device level modules usually follow a bottom-up approach and are
+        mostly technology-specific modules used to realize a service.</t>
+
+        <figure title="Layering and representation">
+          <artwork>+-----------------------------------------------------------------+
+| +-----------------------+                                       |
+| |    Orchestrator       |               Hierachy Abstraction    |
+| |+---------------------+|                                       |
+| ||  Service Modeling   ||                 Service Model         |
+| |+---------------------+|               (Customer Oriented)     |
+| |+---------------------+|             +-+3BW:100M,SLA   +-+     |
+| ||Service Orchestration||             | +---------------+ |     |
+| |+---------------------+|             +-+               +-+     |
+| +-----------------------+          1.start            2.end     |
+|                                      point             point    |
+|                                                                 |
+|                                                                 |
+| +-----------------------+                Network Model          |
+| |   Controller          |               (Operator Oriented)     |
+| |+---------------------+|           +-+    +--+    +---+   +-+  |
+| || Network Modeling    ||           | |    |  |    |   |   | |  |
+| |+---------------------+|           | o----o--o----o---o---o |  |
+| |+---------------------+|           +-+    +--+    +---+   +-+  |
+| ||network Orchestration|            src                    dst  |
+| |+---------------------+|                L3VPN over TE          |
+| |                       |         Instance Name/Access Interface|
+| +-----------------------+         Proto Type/BW/RD,RT,..mapping |
+|                                           for hop               |
+|                                                                 |
+|                                                                 |
+| +-----------------------+                                       |
+| |    Device             |                 Device Model          |
+| |+--------------------+ |                                       |
+| || Device Modeling    | |           Interface add,BGP Peer,     |
+| |+--------------------+ |           Tunnel id,QoS/TE config     |
+| +-----------------------+                                       |
++-----------------------------------------------------------------+</artwork>
+        </figure>
+      </section>
+
+      <section title="Automation of service delivery procedures">
+        <t>To dynamically provide service offerings, Service level modules can
+        be used by an operator. One or more monolithic Service modules can be
+        used in the context of a composite service activation request (e.g.,
+        delivery of a caching infrastructure over a VPN). Such modules are
+        used to feed a decision-making intelligence to adequately accommodate
+        customer's needs.</t>
+
+        <t>Also, such modules may be used jointly with services that require
+        dynamic invocation. An example is provided by the service modules
+        defined by the DOTS WG to dynamically trigger requests to handle DDoS
+        attacks <xref target="I-D.ietf-dots-signal-channel"/><xref
+        target="I-D.ietf-dots-data-channel"/>.</t>
+
+        <t>Network level modules can be derived from service level modules and
+        used to provision, monitor, instantiate the service and provide
+        lifecycle management of network resources, e.g., expose network
+        resources to customers or operators to provide service fulfillment and
+        assurance and allow customers or operators to dynamically adjust the
+        network resources based on service requirements as described in
+        service level modules and the current network performance information
+        described in the Northbound telemetry modules.</t>
+      </section>
+
+      <section title="Service Fullfillment Automation">
+        <t>To operate the service, Device level modules derived from Service
+        level modules or Network level modules can be used to provision each
+        involved network function/device with the proper configuration
+        information, and operate the network based on service requirements as
+        described in the Service level module(s).</t>
+
+        <t>In addition, the operational state including configuration that is
+        in effect together with statistics should be exposed to upper layers
+        to provide better network visibility (and assess to what extent the
+        derived low level modules are consistent with the upper level inputs).
+        Note that it is important to relate telemetry data with configuration
+        data to used closed loops at the different stages of service delivery,
+        from resource allocation to service operation, in particular.</t>
+      </section>
+
+      <section title="YANG Models Integration">
+        <t>To support top-down service delivery, YANG models at different
+        level or at the same level need to be integrated together to enable
+        function, feature in the network device and get network setup, e.g.,
+        the service parameters captured in service level model needs to be
+        decomposed into a set of configuration parameters that may be specific
+        to one or more technologies; these technology-specific parameters are
+        grouped together per technique to define technology-specific device
+        level models or network level models.</t>
+
+        <t>In addition, these technology-specific device level models or
+        network level models can be further integrated with each other using
+        schema mount mechanism to provision each involved network
+        function/device or each involved administrative domain to support
+        newly added module or features. A collecton of device model
+        integreated together can be loaded and validated during implementation
+        time.</t>
+
+        <t>Policies provide a higher layer of abstraction. Policy model can be
+        defined at service level, network level, device level to provide
+        policy based management and telemetry automation,e.g., telemetry data
+        can trigger to generate a new policy that capture new network service
+        requirements.</t>
+
+        <t>Performance measurement telemetry can be used to provide service
+        assurance at service level or at the network level. Performance
+        measurement telemetry model can tie with network level model or
+        service level model to monitor network performance or service level
+        agreement.</t>
+      </section>
+    </section>
+
+    <section title="Architecture Overview">
+      <t>The architectural considerations described in the previous section
+      lead to the architecture described in this section and illustrated in
+      <xref target="arc"/>.</t>
+
+      <figure anchor="arc" title="Service and Network Lifecycle Management">
+        <artwork>                 +------------------+
+  Service level  |                  |
+ -----------     V                  |
+   E2E         E2E                E2E
+ Service  -- Service --------&gt;   Service      ---&gt;Service   ---+
+ Exposure    Creation     ^    Optimization    | Diagnosis     |
+            /Modification |                    |               |
+                 |        |Diff                |               V
+  Multi-layer    |        |         E2E        |        E2E
+  Multi-domain   |        |       Service      |       Service
+  Service Mapping|        +------ Assurance ---+      Decommision
+                 |                     ^
+                 |&lt;-----------------+  |
+  Network level  |                  |  +----+
+------------     V                  |       |
+             Specific           Specific    |      Specific
+             Service  ----+---&gt;  Service ---+--+-&gt;  Service --+
+             Creation     ^    Optimization |  |  Diagnosis   |
+            /Modification |                 |  |              V
+                 |        |Diff             |  |       Specific
+                 |        |     Specific----+  |       Service
+        Service  |        |      Service       |     Decommission
+     Decomposing |        +------Assuance -----+
+                 |                  ^
+                 |                  |    Aggregation
+  Device level   |                  +------------+
+------------     V                               |
+Service      Intent                         Operational
+Fullfillment Config  ------&gt; Config   ----&gt; State      --&gt;Fault
+             Provision       Validate       Telemetry   Diagnostic
+</artwork>
+      </figure>
+
+      <section anchor="details" title="Service Lifecycle management Procedure">
+        <t>Service lifecycle management includes end to end service lifecycle
+        management at the service level and specific network lifecycle
+        management at the network level. The end to end service lifecycle
+        management is multi-domain or multi-layer service management while
+        specific service lifecycle management is domain specific or layer
+        specific service lifecycle management.</t>
+
+        <section title="Service Exposure">
+          <t>A service in the context of this document (sometimes called a
+          Network Service) is some form of connectivity between customer sites
+          and the Internet or between customer sites across the network
+          operator's network and across the Internet.</t>
+
+          <t>Service exposure is used to capture services offered to customers
+          (ordering and order handling). One typical example is that a
+          customer can use a L3SM service model to request L3VPN service by
+          providing the abstract technical characterization of the intended
+          service.</t>
+
+          <t>Service model catalogs can be created along to expose the various
+          services and the information needed to invoke/order a given
+          service.</t>
+        </section>
+
+        <section title="Service Creation/Modification">
+          <t>A customer is unaware of the technology that the network operator
+          has available to deliver the service, so the customer does not make
+          requests specific to the underlying technology but is limited to
+          making requests specific to the service that is to be delivered.
+          This service request can be issued using the service model</t>
+
+          <t>The orchestrator/management system must map such service request
+          to its view. This view can be described as a network model and this
+          mapping may include a choice of which networks and technologies to
+          use depending on which service features have been requested.</t>
+
+          <t>In addition, a customer may require to change underlying nework
+          infrastructure to adapt to new customer's needs and service
+          requirements. This service modfication can be issued in the same
+          service model used by the service request.</t>
+        </section>
+
+        <section title="Service optimization">
+          <t>Service optimization is a technique that gets the configuration
+          of the network updated due to network change, incident mitigation,
+          new service requirements. One typical example is once the tunnel or
+          the VPN is setup, Performance monitoring information or telemetry
+          information per tunnel or per VPN can be collected and fed into the
+          management system, if the network performance doesn't meet the
+          service requirements, the management system can create new VPN
+          policies capturing network service requirements and populate them
+          into the network. Both network performance information and VPN
+          policies can be modelled using YANG. With Policy based mangement,
+          self configuration and self optimization behavior can be specified
+          and implemented.</t>
+        </section>
+
+        <section anchor="diag" title="Service Diagnosis">
+          <t>Operations, Administration, and Maintenance (OAM) are important
+          networking functions for service diagnosis that allow operators
+          to:<list style="symbols">
+              <t>monitor network communications (i.e., reachability
+              verification and Continuity Check)</t>
+
+              <t>troubleshoot failures (i.e., fault verification and
+              localization)</t>
+
+              <t>monitor service-level agreements and performance (i.e.,
+              performance management)</t>
+            </list></t>
+
+          <t>When the network gets down, service diagnosis should be in place
+          to pinpoint the problem and provide recommendation for the network
+          recovery.</t>
+
+          <t>The service diagnosis information can be modelled as
+          technology-independent RPC operations for OAM protocols and
+          technology-independent abstraction of key OAM constructs for OAM
+          protocols [RFC8531][RFC8533]. These models can provide consistent
+          configuration, reporting, and presentation for the OAM mechanisms
+          used to manage the network.</t>
+        </section>
+
+        <section title="Service Decomission">
+          <t>Service decommision allow the customer to stop the service and
+          remove the service from active status and release the network
+          resource that is allocated to the service. Customer can also use the
+          service model to delete the service.</t>
+        </section>
+      </section>
+
+      <section title="Service Fullfillment management Procedure">
+        <section title="Intended Configuration provision">
+          <t>Intended configuration at the device level is derived from
+          network model at the network level or service model at the service
+          level and represents the configuration that the system attempts to
+          apply. Take L3SM service model as an example, to deliver a L3VPN
+          service, we need to map L3VPN service view defined in Service model
+          into detailed intended configuration view defined by specific
+          configuration models for network elements, configuartion information
+          includes:<list style="symbols">
+              <t>VRF definition, including VPN Policy expression</t>
+
+              <t>Physical Interface</t>
+
+              <t>IP layer (IPv4, IPv6).</t>
+
+              <t>QoS features such as classification, profiles, etc.</t>
+
+              <t>Routing protocols: support of configuration of all protocols
+              listed in the document, as well as routing policies associated
+              with those protocols.</t>
+
+              <t>Multicast Support</t>
+
+              <t>NAT or address sharing</t>
+
+              <t>Securfity function.</t>
+            </list></t>
+
+          <t>This specific configuration models can be used to configure PE
+          and CE devices within the site, e.g., A BGP policy model is used to
+          establish VPN membership between sites and VPN Service Topology.</t>
+        </section>
+
+        <section title="Configuration Validation">
+          <t>Configuraton validation is used to validate intended
+          configuration and make sure the configuration take effect. One
+          example is a client creates an interface "et-0/0/0" but the
+          interface does not physically exist at this point, then
+          configurfation data appears in the &lt;intended&gt; but does not
+          appear in &lt;operational&gt; datastore.</t>
+        </section>
+
+        <section title="Operational state telemetry">
+          <t>&lt;operational&gt; datastore holds the complete operational
+          state of the device including learned, system, default configuraton
+          and system state. &lt;operational&gt; datastore can be used as
+          telemetry data source and allows the client subscribe to updates of
+          a YANG datastore. Based on criteria negotiated as part of a
+          subscription, updates will be pushed to targeted recipients using
+          YANG push mechanism [RFC8641].</t>
+        </section>
+
+        <section title="Fault Diagnostic">
+          <t>Technology-dependent nodes and remote procedure call (RPC)
+          commands are defined in technology- specific YANG data models which
+          use and extend the base model described in <xref
+          target="diag"/>.</t>
+
+          <t>These RPC command recieved in the technology dependent node can
+          be used to trigger technology specific OAM message exchange for
+          fault verification and fault isolation.</t>
+        </section>
+      </section>
+
+      <section title="Multi-layer/Multi-domain Service Mapping">
+        <t>Multi-layer/Multi-domain Service Mapping allow you map end to end
+        abstract view of the service segmented at different layer or different
+        administrative domain into domain specific view. One example is to map
+        service parameters in L3VPN service model into configuration
+        parameters such as RD, RT, VRF in L3VPN network model. Another example
+        is map service parameters in L3VPN service model into TE tunnel
+        parameter (e.g.,Tunnel ID) in TE model and VN parameters(e.g., AP
+        list, VN member) in TEAS VN model [I-D.ietf-teas-actn-vn-yang].</t>
+      </section>
+
+      <section title="Service Decomposing">
+        <t>Service Decomposing allow you to decompose service model at the
+        service level or network model at the network level into a set of
+        device configuration models at the device level. These device models
+        may be tied to specific device type or classified into a collection of
+        related YANG modules based on service type and feature offered and
+        load at the implementation time before configuration is loaded and
+        validated.</t>
+      </section>
+    </section>
+
+    <section title="YANG Data Model integration Examples">
+      <section title="L3VPN Service Delivery">
+        <figure title="L3VPN Service Delivery Example">
+          <artwork>              L3SM    |
+            Service   |
+             Model    |
+ +--------------------+----------------------------+
+ |              +-----V- -------+                  |
+ | Orchestrator |Service Mapping|                  |
+ |              +-----+---------+                  |
+ |                    |                            |
+ +--------------------+----------------------------+
+                L3NM  |
+               Network|
+                Model |
+ +--------------------+----------------------------+
+ | Controller+--------V-----------+                |
+ |           | Service Decomposing|                |
+ |           +-++------------++---+                |
+ |             ||            ||                    |
+ |             ||            ||                    |
+ +-------------++----------  ++--------------------+
+               ||            ||
+               ||            ||
+               ||BGP,QoS     ||
+               ||            ||
+    +----------+|NI,Intf,IP  |+-----------------+
+ +--+--+      +++---+      --+---+           +--+--+
+ | CE1 |------| PE1 |      | PE2 |  ---------+ CE2 |
+ +-----+      +-----+      +-----+           +-----+</artwork>
+        </figure>
+
+        <t>The following steps are performed to deliver the service within the
+        network management automation architecture proposed in this document:
+        <list style="numbers">
+            <t>Customer Requests to create two sites based on L3SM Service
+            model with each having one network access connectivity:<list
+                style="sybmols">
+                <t>Site A: Network-Access A, Bandwidth=20M, for class "foo",
+                guaranteed-bw-percent = 10, One-Way-Delay=70 msec</t>
+
+                <t>Site B: Network-Access B, Bandwidth=30M, for class "foo1",
+                guaranteed-bw-percent = 15, One-Way-Delay=60 msec</t>
+              </list></t>
+
+            <t>The Orchestrator takes servie parameters in the L3SM model as
+            input and translating them to an orchestrated configuration of
+            network elements (e.g.,RD,RT, VRF,etc) that is part of the L3NM
+            network model.</t>
+
+            <t>The Controller takes orchestrated configuration parameters in
+            the L3NM network model and translate them into orchestrated
+            configuration of network elements that is part of BGP model, QoS
+            model, Network Instance model, IP management model, interface
+            model,etc.</t>
+          </list></t>
+      </section>
+
+      <section title="VN lifecycle management Example">
+        <figure>
+          <artwork>                        |
+                 VN     |
+                Service |
+                Model   |
+ +------------------- --|--------------------------+
+ | Orchestrator(MDSC)   |                          |
+ |             +--------V--------+   +----------+  |
+ |             | Service Mapping | +-+ECA Engine|  |
+ |             +-----------------+ | +--------^-+  |
+ +----------------------+----------+----------+----+
+                TE      |     ECA  |  NBI Telemetry
+               Tunnel   |    Policy|   Model  |
+               Model    |          |          |
+ +----------------------V----------V----------+----+
+ | Controller(PNC)                                 |
+ |                                                 |
+ +-------------------------------------------------+
+
+ +-----+      +-----+        +-----+         +-----+
+ | CE1 |------| PE1 |        | PE2 |---------+ CE2 |
+ +-----+      +-----+        +-----+         +-----+</artwork>
+        </figure>
+
+        <t>The following steps are performed to deliver the VN service within
+        the network management automation architecture proposed in this
+        document:<list style="numbers">
+            <t>Customer requests to create VN based on Acces point,
+            association between VN and Access point, VN member defined in VN
+            YANG model.</t>
+
+            <t>The orchestrator creates the single abstract node topology
+            based VN YANG model</t>
+
+            <t>Customer exchange connectivity-matrix on abstract node and
+            explicit path using TE topology model with the orchestrator. These
+            information can be used to instantiate VN and setup tunnels
+            between source endpoint and destination endpoint.</t>
+
+            <t>The NBI telemetry which augment The TEAS VN model and
+            corresponding TE Tunnel model can be used to notify all the
+            parameter changes and network performance change related to VN
+            topology or TunnelI-D.ietf-teas-actn-pm-telemetry-autonomics].
+            These information can be further used as input to ECA engine in
+            the orchestrator and generate ECA policy model to optimize the
+            network.</t>
+          </list></t>
+      </section>
+    </section>
+
+    <section title="Security Considerations">
+      <t>Security considerations specific to each of the technologies and
+      protocols listed in the document are discussed in the specification
+      documents of each of these techniques.</t>
+
+      <t>(Potential) security considerations specific to this document are
+      listed below:<list style="symbols">
+          <t>Create forwarding loops by mis-configuring the underlying
+          network.</t>
+
+          <t>Leak sensitive information: special care should be considered
+          when translating between the various layers introduced in the
+          document.</t>
+
+          <t>...tbc</t>
+        </list></t>
+    </section>
+
+    <section title="IANA Considerations">
+      <t>There are no IANA requests or assignments included in this
+      document.</t>
+    </section>
+
+    <section anchor="ack" title="Acknowledgements">
+      <t>Thanks to Joe Clark and Greg Mirsky ,Shunsuke Homma for the
+      review.</t>
+    </section>
+  </middle>
+
+  <back>
+    <references title="Informative References">
+      <?rfc include="reference.RFC.8199"?>
+
+      <?rfc include="reference.RFC.8299"?>
+
+      <?rfc include="reference.RFC.8309"?>
+
+      <?rfc include="reference.RFC.7149"?>
+
+      <?rfc include="reference.RFC.7297"?>
+
+      <?rfc include="reference.RFC.8328"?>
+
+      <?rfc include="reference.RFC.8194"?>
+
+      <?rfc include="reference.RFC.8349"?>
+
+      <?rfc include="reference.RFC.8466"?>
+
+      <?rfc include='reference.RFC.4364'?>
+
+      <?rfc include="reference.RFC.8345"?>
+
+      <?rfc include="reference.RFC.8346"?>
+
+      <?rfc include="reference.RFC.8512"?>
+
+      <?rfc include='reference.RFC.7276'?>
+
+      <?rfc include='reference.RFC.8513'?>
+
+      <?rfc include='reference.I-D.ietf-softwire-yang'?>
+
+      <?rfc include='reference.I-D.ietf-softwire-iftunnel'?>
+
+      <?rfc include="reference.RFC.8528"?>
+
+      <?rfc include="reference.RFC.8529"?>
+
+      <?rfc include="reference.RFC.8530"?>
+
+      <?rfc include='reference.RFC.8532'?>
+
+      <?rfc include='reference.RFC.8533'?>
+
+      <?rfc include="reference.I-D.arkko-arch-virtualization"?>
+
+      <?rfc include='reference.I-D.ietf-dots-signal-channel'?>
+
+      <?rfc include='reference.I-D.ietf-dots-data-channel'?>
+
+      <?rfc include="reference.I-D.ietf-teas-yang-te-topo"?>
+
+      <?rfc include="reference.I-D.ietf-teas-yang-l3-te-topo"?>
+
+      <?rfc include="reference.I-D.ietf-teas-yang-sr-te-topo"?>
+
+      <?rfc include="reference.I-D.ietf-teas-yang-te"?>
+
+      <?rfc include="reference.I-D.ietf-teas-yang-rsvp-te"?>
+
+      <?rfc include="reference.I-D.ietf-teas-yang-path-computation"?>
+
+      <?rfc include="reference.RFC.8531"?>
+
+      <?rfc include='reference.RFC.4664'?>
+
+      <?rfc include='reference.RFC.8077'?>
+
+      <?rfc include='reference.RFC.4762'?>
+
+      <?rfc include='reference.RFC.4761'?>
+
+      <?rfc include='reference.RFC.5880'?>
+
+      <?rfc include="reference.I-D.ietf-ccamp-alarm-module"?>
+
+      <?rfc include="reference.I-D.ietf-rtgwg-device-model"?>
+
+      <?rfc include="reference.I-D.ietf-idr-bgp-model"?>
+
+      <?rfc include="reference.I-D.ietf-mpls-base-yang"?>
+
+      <?rfc include="reference.I-D.asechoud-netmod-diffserv-model"?>
+
+      <?rfc include="reference.RFC.8519"?>
+
+      <?rfc include="reference.I-D.ietf-pim-igmp-mld-yang"?>
+
+      <?rfc include="reference.I-D.ietf-pim-yang"?>
+
+      <?rfc include="reference.I-D.ietf-pim-igmp-mld-snooping-yang"?>
+
+      <?rfc include="reference.I-D.clacla-netmod-model-catalog"?>
+
+      <?rfc include="reference.I-D.ietf-ccamp-otn-topo-yang"?>
+
+      <?rfc include="reference.I-D.ietf-ccamp-l1csm-yang"?>
+
+      <?rfc include="reference.I-D.ietf-teas-actn-vn-yang"?>
+
+      <?rfc include="reference.I-D.ietf-teas-sf-aware-topo-model"?>
+
+      <?rfc include="reference.I-D.ietf-ccamp-flexigrid-yang"?>
+
+      <?rfc include="reference.I-D.ietf-ccamp-flexigrid-media-channel-yang"?>
+
+      <?rfc include="reference.I-D.ietf-ccamp-wson-tunnel-model"?>
+
+      <?rfc include="reference.I-D.ietf-ccamp-otn-tunnel-model"?>
+
+      <?rfc include="reference.I-D.ietf-ccamp-mw-yang"?>
+
+      <?rfc include="reference.I-D.ietf-bess-evpn-yang"?>
+
+      <?rfc include="reference.I-D.ietf-bess-l3vpn-yang"?>
+
+      <?rfc include="reference.I-D.ietf-bess-l2vpn-yang"?>
+
+      <?rfc include="reference.I-D.ietf-rtgwg-policy-model"?>
+
+      <?rfc include="reference.I-D.ietf-bfd-yang"?>
+
+      <?rfc include="reference.I-D.ietf-ippm-twamp-yang"?>
+
+      <?rfc include="reference.I-D.ietf-ippm-stamp-yang"?>
+
+      <?rfc include="reference.I-D.ietf-spring-sr-yang"?>
+
+      <?rfc include="reference.I-D.ietf-teas-te-service-mapping-yang"?>
+
+      <?rfc include="reference.I-D.ietf-supa-generic-policy-data-model"?>
+
+      <?rfc include="reference.I-D.homma-slice-provision-models"?>
+    </references>
+
+    <section title="Layered YANG Modules Example Overview">
+      <section anchor="ns" title="Service Models: Definition and Samples">
+        <t>As described in <xref target="RFC8309"/>, the service is "some form
+        of connectivity between customer sites and the Internet and/or between
+        customer sites across the network operator's network and across the
+        Internet". More concretely, an IP connectivity service can be defined
+        as the IP transfer capability characterized by a (Source Nets,
+        Destination Nets, Guarantees, Scope) tuple where "Source Nets" is a
+        group of unicast IP addresses, "Destination Nets" is a group of IP
+        unicast and/or multicast addresses, and "Guarantees" reflects the
+        guarantees (expressed in terms of Quality Of Service (QoS),
+        performance, and availability, for example) to properly forward
+        traffic to the said "Destination" <xref target="RFC7297"/>.</t>
+
+        <t>For example:<list style="symbols">
+            <t>L3SM model <xref target="RFC8299"/> defines the L3VPN service
+            ordered by a customer from a network operator.</t>
+
+            <t>L2SM model <xref target="RFC8466"/> defines the L2VPN service
+            ordered by a customer from a network operator.</t>
+
+            <t>VN model <xref target="I-D.ietf-teas-actn-vn-yang"/>provides a
+            YANG data model generally applicable to any mode of Virtual
+            Network (VN) operation.</t>
+          </list></t>
+      </section>
+
+      <section anchor="rm" title="Network Models: Definitions and Samples">
+        <t><xref target="rfn"/> depicts a set of Network models such as
+        topology models or tunnel models:</t>
+
+        <figure align="center" anchor="rfn"
+                title="Sample Resource Facing Network Models">
+          <artwork>                     |                             |
+   Topo YANG modules |   Tunnel YANG modules       |
+   ------------------------------------------------|
++------------+       |                             |
+|Network Top |       | +------+  +-----------+     |      
+|   Model    |       | |Other |  | TE Tunnel |     |       
++----+-------+       | |Tunnel|  +------+----+     |       
+     |   +--------+  | +------+         |          |       
+     |---+Svc Topo|  |         +--------+-+--------+       
+     |   +--------+  |    +----+---+  +---+----+ +-+-----+ 
+     |   +--------+  |    |MPLS-TE |  |RSVP-TE | |SR TE  | 
+     |---+L2 Topo |  |    | Tunnel |  | Tunnel | |Tunnel | 
+     |   +--------+  |    +--------+  +--------+ +-------+ 
+     |   +--------+  |                                    
+     |---+TE Topo |  |                                   
+     |   +--------+  |                                   
+     |   +--------+  |                                   
+     +---+L3 Topo |  |                                  
+         +--------+  |                                  </artwork>
+        </figure>
+
+        <t>Topology YANG model Examples:</t>
+
+        <t><list style="symbols">
+            <t>Network Topology Models: [RFC8345] defines a base model for
+            network topology and inventories. Network topology data include
+            link resource, node resource, and terminate-point resources.</t>
+
+            <t>TE Topology Models: [I.D-ietf-teas-yang-te-topo] defines a data
+            model for representing and manipulating TE topologies. <vspace
+            blankLines="1"/>This module is extended from network topology
+            model defined in [RFC8345] with TE topologies specifics. This
+            model contains technology-agnostic TE Topology building blocks
+            that can be augmented and used by other technology-specific TE
+            Topology models.</t>
+
+            <t>L3 Topology Models<vspace blankLines="1"/>[RFC8346] defines a
+            data model for representing and manipulating L3 Topologies. This
+            model is extended from the network topology model defined in
+            [RFC8345] with L3 topologies specifics.</t>
+
+            <t>L2 Topology Models<vspace
+            blankLines="1"/>[I.D-ietf-i2rs-yang-l2-topology] defines a data
+            model for representing and manipulating L2 Topologies. This model
+            is extended from the network topology model defined in [RFC8345]
+            with L2 topologies specifics.</t>
+          </list></t>
+
+        <t>Tunnel YANG model Examples:<list style="symbols">
+            <t>Tunnel identities <xref target="I-D.ietf-softwire-iftunnel"/>
+            to ease manipulating extensions to specific tunnels.</t>
+
+            <t>TE Tunnel Model<vspace blankLines="1"/>[I.D-ietf-teas-yang-te]
+            defines a YANG module for the configuration and management of TE
+            interfaces, tunnels and LSPs.</t>
+
+            <t>SR TE Tunnel Model<vspace
+            blankLines="1"/>[I.D-ietf-teas-yang-te] augments the TE generic
+            and MPLS-TE model(s) and defines a YANG module for Segment Routing
+            (SR) TE specific data.</t>
+
+            <t>MPLS TE Model<vspace blankLines="1"/>[I.D-ietf-teas-yang-te]
+            augments the TE generic and MPLS-TE model(s) and defines a YANG
+            module for MPLS TE configurations, state, RPC and
+            notifications.</t>
+
+            <t>RSVP-TE MPLS Model<vspace
+            blankLines="1"/>[I.D-ietf-teas-yang-rsvp-te] augments the RSVP-TE
+            generic module with parameters to configure and manage signaling
+            of MPLS RSVP-TE LSPs.</t>
+          </list></t>
+
+        <t>Other Network Models:<list style="symbols">
+            <t>Path Computation API Model<vspace
+            blankLines="1"/>[I.D-ietf-teas-path-computation] YANG module for a
+            stateless RPC which complements the stateful solution defined in
+            [I.D-ietf-teas-yang-te].</t>
+
+            <t>OAM Models (including Fault Management (FM) and Performance
+            Monitoring)<vspace blankLines="1"/><xref target="RFC8532"/>
+            defines a base YANG module for the management of OAM protocols
+            that use Connectionless Communications. <xref target="RFC8533"/>
+            defines a retrieval method YANG module for connectionless OAM
+            protocols. [RFC8531] defines a base YANG module for connection
+            oriented OAM protocols. These three models are intended to provide
+            consistent reporting, configuration and representation for
+            connection-less OAM and Connection oriented OAM separately.<vspace
+            blankLines="1"/>Alarm monitoring is a fundamental part of
+            monitoring the network. Raw alarms from devices do not always tell
+            the status of the network services or necessarily point to the
+            root cause. [I.D-ietf-ccamp-alarm-module]defines a YANG module for
+            alarm management.</t>
+
+            <t>Generic Policy Model<vspace blankLines="1"/>The Simplified Use
+            of Policy Abstractions (SUPA) policy-based management framework
+            [RFC8328] defines base YANG modules <xref
+            target="I-D.ietf-supa-generic-policy-data-model"/>to encode
+            policy. These models point to device-, technology-, and
+            service-specific YANG modules developed elsewhere. Policy rules
+            within an operator's environment can be used to express
+            high-level, possibly network-wide, policies to a network
+            management function (within a controller, an orchestrator, or a
+            network element). The network management function can then control
+            the configuration and/or monitoring of network elements and
+            services. This document describes the SUPA basic framework, its
+            elements, and interfaces.</t>
+          </list></t>
+      </section>
+
+      <section title="Device Models: Definitions and Samples">
+        <t>Network Element models (<xref target="device"/>) are used to
+        describe how a service can be implemented by activating and tweaking a
+        set of functions (enabled in one or multiple devices, or hosted in
+        cloud infrastructures) that are involved in the service delivery. The
+        following figure uses IETF defined models as an example.<figure
+            anchor="device" title="Network Element Modules Overview">
+            <artwork>
+                                       +----------------+
+                                     --|Device Model    |
+                                     | +----------------+
+                                     | +------------------+
+                  +---------------+  | |Logical Network   |
+                  |               |  --|  Element Mode    |
+                  | Architecture  |  | +------------------+
+                  |               |  | +----------------------+
+                  +-------+-------+  --|Network Instance Mode |
+                          |          | +----------------------+
+                          |          | +-------------------+
+                          |          --|Routing Type Model |
+                          |            +-------------------+
+  +-------+----------+----+------+------------+-----------+-------+
+  |       |          |           |            |           |       |
++-+-+ +---+---+   +--+------+  +-+-+    +-----+---+   +---+-+     |
+|ACL| |Routing|   |Transport|  |OAM|    |Multicast|   |  PM |  Others
++---+ |-------+   +---------+  +---+    +---------+   +-----+
+      | +-------+  +----------+ +-------+   +-----+    +-----+
+      --|Core   |  |MPLS Basic| |BFD    |   |IGMP |    |TWAMP|
+      | |Routing|  +----------+ +-------+   |/MLD |    +-----+
+      | +-------+  |MPLS LDP  | |LSP Ping   +-----+    |OWAMP|
+      --|BGP    |  +----------+ +-------+   |PIM  |    +-----+
+      | +-------+  |MPLS Static |MPLS-TP|   +-----+    |LMAP |
+      --|ISIS   |  +----------+ +-------+   |MVPN |    +-----+
+      | +-------+                           +-----+
+      --|OSPF   |
+      | +-------+
+      --|RIP    |                                           
+      | +-------+
+      --|VRRP   |
+      | +-------+
+      --|SR/SRv6|
+      | +-------+
+      --|ISIS-SR|   
+      | +-------+
+      --|OSPF-SR|
+        +-------+</artwork>
+          </figure></t>
+
+        <section title="Model Composition">
+          <t><list style="symbols">
+              <t>Device Model<vspace
+              blankLines="1"/>[I.D-ietf-rtgwg-device-model] presents an
+              approach for organizing YANG modules in a comprehensive logical
+              structure that may be used to configure and operate network
+              devices. The structure is itself represented as an example YANG
+              module, with all of the related component models logically
+              organized in a way that is operationally intuitive, but this
+              model is not expected to be implemented.</t>
+
+              <t>Logical Network Element Model<vspace
+              blankLines="1"/>[RFC8530] defines a logical network element
+              module which can be used to manage the logical resource
+              partitioning that may be present on a network device. Examples
+              of common industry terms for logical resource partitioning are
+              Logical Systems or Logical Routers.</t>
+
+              <t>Network Instance Model<vspace blankLines="1"/>[RFC8529]
+              defines a network instance module. This module can be used to
+              manage the virtual resource partitioning that may be present on
+              a network device. Examples of common industry terms for virtual
+              resource partitioning are Virtual Routing and Forwarding (VRF)
+              instances and Virtual Switch Instances (VSIs).</t>
+            </list></t>
+
+          <section title="Schema Mount">
+            <t>Modularity and extensibility were among the leading design
+            principles of the YANG data modeling language. As a result, the
+            same YANG module can be combined with various sets of other
+            modules and thus form a data model that is tailored to meet the
+            requirements of a specific use case. <xref target="RFC8528"/>
+            defines a mechanism, denoted schema mount, that allows for
+            mounting one data model consisting of any number of YANG modules
+            at a specified location of another (parent) schema.</t>
+
+            <t>That capability does not cover design time.</t>
+          </section>
+        </section>
+
+        <section title="Device Models: Definitions and Samples">
+          <t><list hangIndent="11" style="hanging">
+              <t hangText="BGP:">[I-D.ietf-idr-bgp-yang-model] defines a YANG
+              module for configuring and managing BGP, including protocol,
+              policy, and operational aspects based on data center, carrier
+              and content provider operational requirements.</t>
+
+              <t hangText="MPLS:">[I-D.ietf-mpls-base-yang] defines a base
+              model for MPLS which serves as a base framework for configuring
+              and managing an MPLS switching subsystem. It is expected that
+              other MPLS technology YANG modules (e.g. MPLS LSP Static, LDP or
+              RSVP-TE models) will augment the MPLS base YANG module.</t>
+
+              <t hangText="QoS:">[I-D.asechoud-netmod-diffserv-model]
+              describes a YANG module of Differentiated Services for
+              configuration and operations.</t>
+
+              <t hangText="ACL:">Access Control List (ACL) is one of the basic
+              elements used to configure device forwarding behavior. It is
+              used in many networking technologies such as Policy Based
+              Routing, Firewalls, etc. <xref target="RFC8519"/> describes a
+              data model of Access Control List (ACL) basic building
+              blocks.</t>
+
+              <t hangText="NAT:">For the sake of network automation and the
+              need for programming Network Address Translation (NAT) function
+              in particular, a data model for configuring and managing the NAT
+              is essential. <xref target="RFC8512"/> defines a YANG module for
+              the NAT function covering a variety of NAT flavors such as
+              Network Address Translation from IPv4 to IPv4 (NAT44), Network
+              Address and Protocol Translation from IPv6 Clients to IPv4
+              Servers (NAT64), customer-side translator (CLAT), Stateless
+              IP/ICMP Translation (SIIT), Explicit Address Mappings (EAM) for
+              SIIT, IPv6-to-IPv6 Network Prefix Translation (NPTv6), and
+              Destination NAT. <xref target="RFC8513"/> specifies a YANG
+              module for the DS-Lite AFTR.</t>
+
+              <t hangText="Stateless Address Sharing:"><xref
+              target="I-D.ietf-softwire-yang"/> specifies a YANG module for
+              A+P address sharing, including Lightweight 4over6, Mapping of
+              Address and Port with Encapsulation (MAP-E), and Mapping of
+              Address and Port using Translation (MAP-T) softwire
+              mechanisms.</t>
+
+              <t hangText="Multicast:">[I-D.ietf-pim-yang] defines a YANG
+              module that can be used to configure and manage Protocol
+              Independent Multicast (PIM) devices.
+              [I-D.ietf-pim-igmp-mld-yang] defines a YANG module that can be
+              used to configure and manage Internet Group Management Protocol
+              (IGMP) and Multicast Listener Discovery (MLD) devices.
+              [I-D.ietf-pim-igmp-mld-snooping-yang] defines a YANG module that
+              can be used to configure and manage Internet Group Management
+              Protocol (IGMP) and Multicast Listener Discovery (MLD) Snooping
+              devices.</t>
+
+              <t hangText="EVPN:">[I-D.ietf-bess-evpn-yang] defines a YANG
+              module for Ethernet VPN services. The model is agnostic of the
+              underlay. It apply to MPLS as well as to VxLAN encapsulation.
+              The model is also agnostic of the services including E-LAN,
+              E-LINE and E-TREE services. This document mainly focuses on EVPN
+              and Ethernet-Segment instance framework.</t>
+
+              <t hangText="L3VPN:">[I-D.ietf-bess-l3vpn-yang] defines a YANG
+              module that can be used to configure and manage BGP L3VPNs <xref
+              target="RFC4364"/>. It contains VRF specific parameters as well
+              as BGP specific parameters applicable for L3VPNs.</t>
+
+              <t hangText="L2VPN:">[I-D.ietf-bess-l2vpn-yang] defines a YANG
+              module for MPLS based Layer 2 VPN services (L2VPN) [RFC4664] and
+              includes switching between the local attachment circuits. The
+              L2VPN model covers point-to-point VPWS and Multipoint VPLS
+              services. These services use signaling of Pseudowires across
+              MPLS networks using LDP <xref target="RFC8077"/><xref
+              target="RFC4762"/> or BGP <xref target="RFC4761"/>.</t>
+
+              <t hangText="Routing Policy:">[I-D.ietf-rtgwg-policy-model]
+              defines a YANG module for configuring and managing routing
+              policies in a vendor-neutral way and based on actual operational
+              practice. The model provides a generic policy framework which
+              can be augmented with protocol-specific policy
+              configuration.</t>
+
+              <t hangText="BFD:">[I-D.ietf-bfd-yang]defines a YANG module that
+              can be used to configure and manage Bidirectional Forwarding
+              Detection (BFD) <xref target="RFC5880"/>. BFD is a network
+              protocol which is used for liveness detection of arbitrary paths
+              between systems.</t>
+
+              <t hangText="SR/SRv6:">[I-D.ietf-spring-sr-yang] a YANG module
+              for segment routing configuration and operation.
+              [I-D.raza-spring-srv6-yang] defines a YANG module for Segment
+              Routing IPv6 (SRv6) base. The model serves as a base framework
+              for configuring and managing an SRv6 subsystem and expected to
+              be augmented by other SRv6 technology models accordingly.</t>
+
+              <t hangText="Core Routing:"><xref target="RFC8349"/> defines the
+              core routing data model, which is intended as a basis for future
+              data model development covering more-sophisticated routing
+              systems. It is expected that other Routing technology YANG
+              modules (e.g., VRRP, RIP, ISIS, OSPF models) will augment the
+              Core Routing base YANG module.</t>
+
+              <t hangText="PM:"><vspace
+              blankLines="1"/>[I.D-ietf-ippm-twamp-yang] defines a data model
+              for client and server implementations of the Two-Way Active
+              Measurement Protocol (TWAMP).<vspace
+              blankLines="1"/>[I.D-ietf-ippm-stamp-yang] defines the data
+              model for implementations of Session-Sender and
+              Session-Reflector for Simple Two-way Active Measurement Protocol
+              (STAMP) mode using YANG. <vspace blankLines="1"/>[RFC8194]
+              defines a data model for Large-Scale Measurement Platforms
+              (LMAPs).</t>
+            </list></t>
+        </section>
+      </section>
+    </section>
+  </back>
+</rfc>
