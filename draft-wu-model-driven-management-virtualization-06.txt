@@ -5,7 +5,7 @@
 Networking Working Group                                           Q. Wu
 Internet-Draft                                                    Huawei
 Intended status: Informational                              M. Boucadair
-Expires: April 11, 2020                                     C. Jacquenet
+Expires: April 12, 2020                                     C. Jacquenet
                                                                   Orange
                                              L. Miguel Contreras Murillo
                                                               Telifonica
@@ -18,7 +18,7 @@ Expires: April 11, 2020                                     C. Jacquenet
                                                             China Mobile
                                                                   Y. Lee
                                                                Futurewei
-                                                         October 9, 2019
+                                                        October 10, 2019
 
 
   A Framework for Automating Service and Network Management with YANG
@@ -28,13 +28,14 @@ Abstract
 
    Data models for service and network management provides a
    programmatic approach for representing (virtual) services or networks
-   and deriving configuration information that will be forwarded to
-   network and service components that are used to build and deliver the
-   service.  Data Models can be used during various phases of the
-   service and network management life cycle, such as service
+   and deriving (1) configuration information that will be communicated
+   to network and service components that are used to build and deliver
+   the service and (2) state information that will be monitored and
+   tracked.  Indeed, data models can be used during various phases of
+   the service and network management life cycle, such as service
    instantiation, service provisioning, optimization, monitoring, and
-   diagnostic.  Also, data models are are instrumental in the automation
-   of network management.  They also provide closed-loop control for the
+   diagnostic.  Also, data models are instrumental in the automation of
+   network management.  They also provide closed-loop control for the
    sake of adaptive and deterministic service creation, delivery, and
    maintenance.
 
@@ -42,7 +43,7 @@ Abstract
    architecture for service and network management automation that takes
    advantage of YANG modeling technologies.  This framework is drawn
    from a network provider perspective irrespective of the origin of a
-   data module andcan accommodate even modules that are developed
+   data module; it can accommodate even modules that are developed
    outside the IETF.
 
    The document aims to exemplify an approach that specifies the journey
@@ -52,8 +53,7 @@ Abstract
 
 
 
-
-Wu, et al.               Expires April 11, 2020                 [Page 1]
+Wu, et al.               Expires April 12, 2020                 [Page 1]
 
 Internet-Draft  Service and Network Management Automation   October 2019
 
@@ -73,7 +73,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on April 11, 2020.
+   This Internet-Draft will expire on April 12, 2020.
 
 Copyright Notice
 
@@ -93,48 +93,48 @@ Copyright Notice
 Table of Contents
 
    1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   3
-     1.1.  Terminology . . . . . . . . . . . . . . . . . . . . . . .   5
-   2.  Architectural Concepts  . . . . . . . . . . . . . . . . . . .   5
-     2.1.  Data Models: Layering and Representation  . . . . . . . .   5
-     2.2.  Automation of service delivery procedures . . . . . . . .   7
-     2.3.  Service Fullfillment Automation . . . . . . . . . . . . .   8
-     2.4.  YANG Models Integration . . . . . . . . . . . . . . . . .   8
-   3.  Architecture Overview . . . . . . . . . . . . . . . . . . . .   9
-     3.1.  Service Lifecycle management Procedure  . . . . . . . . .  10
-       3.1.1.  Service Exposure  . . . . . . . . . . . . . . . . . .  10
-       3.1.2.  Service Creation/Modification . . . . . . . . . . . .  11
-       3.1.3.  Service optimization  . . . . . . . . . . . . . . . .  11
-       3.1.4.  Service Diagnosis . . . . . . . . . . . . . . . . . .  11
-       3.1.5.  Service Decomission . . . . . . . . . . . . . . . . .  12
+   2.  Terminology . . . . . . . . . . . . . . . . . . . . . . . . .   5
+   3.  Architectural Concepts & Goals  . . . . . . . . . . . . . . .   5
+     3.1.  Data Models: Layering and Representation  . . . . . . . .   5
+     3.2.  Automation of Service Delivery Procedures . . . . . . . .   7
+     3.3.  Service Fullfillment Automation . . . . . . . . . . . . .   8
+     3.4.  YANG Modules Integration  . . . . . . . . . . . . . . . .   8
+   4.  Architecture Overview . . . . . . . . . . . . . . . . . . . .   9
+     4.1.  Service Lifecycle Management Procedure  . . . . . . . . .  10
+       4.1.1.  Service Exposure  . . . . . . . . . . . . . . . . . .  11
+       4.1.2.  Service Creation/Modification . . . . . . . . . . . .  11
+       4.1.3.  Service Optimization  . . . . . . . . . . . . . . . .  11
+       4.1.4.  Service Diagnosis . . . . . . . . . . . . . . . . . .  12
+       4.1.5.  Service Decommission  . . . . . . . . . . . . . . . .  12
 
 
 
-Wu, et al.               Expires April 11, 2020                 [Page 2]
+Wu, et al.               Expires April 12, 2020                 [Page 2]
 
 Internet-Draft  Service and Network Management Automation   October 2019
 
 
-     3.2.  Service Fullfillment management Procedure . . . . . . . .  12
-       3.2.1.  Intended Configuration provision  . . . . . . . . . .  12
-       3.2.2.  Configuration Validation  . . . . . . . . . . . . . .  13
-       3.2.3.  Operational state telemetry . . . . . . . . . . . . .  13
-       3.2.4.  Fault Diagnostic  . . . . . . . . . . . . . . . . . .  13
-     3.3.  Multi-layer/Multi-domain Service Mapping  . . . . . . . .  13
-     3.4.  Service Decomposing . . . . . . . . . . . . . . . . . . .  14
-   4.  YANG Data Model integration Examples  . . . . . . . . . . . .  14
-     4.1.  L3VPN Service Delivery  . . . . . . . . . . . . . . . . .  14
-     4.2.  VN lifecycle management Example . . . . . . . . . . . . .  15
-   5.  Security Considerations . . . . . . . . . . . . . . . . . . .  16
-   6.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  16
-   7.  Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .  16
-   8.  Informative References  . . . . . . . . . . . . . . . . . . .  17
-   Appendix A.  Layered YANG Modules Example Overview  . . . . . . .  24
-     A.1.  Service Models: Definition and Samples  . . . . . . . . .  24
-     A.2.  Network Models: Definitions and Samples . . . . . . . . .  25
+     4.2.  Service Fullfillment Management Procedure . . . . . . . .  12
+       4.2.1.  Intended Configuration Provision  . . . . . . . . . .  12
+       4.2.2.  Configuration Validation  . . . . . . . . . . . . . .  13
+       4.2.3.  Operational State Telemetry . . . . . . . . . . . . .  13
+       4.2.4.  Fault Diagnostic  . . . . . . . . . . . . . . . . . .  13
+     4.3.  Multi-layer/Multi-domain Service Mapping  . . . . . . . .  14
+     4.4.  Service Decomposing . . . . . . . . . . . . . . . . . . .  14
+   5.  YANG Data Model Integration Examples  . . . . . . . . . . . .  14
+     5.1.  L3VPN Service Delivery  . . . . . . . . . . . . . . . . .  14
+     5.2.  VN Lifecycle Management Example . . . . . . . . . . . . .  16
+   6.  Security Considerations . . . . . . . . . . . . . . . . . . .  17
+   7.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  17
+   8.  Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .  17
+   9.  Informative References  . . . . . . . . . . . . . . . . . . .  17
+   Appendix A.  Layered YANG Modules Example Overview  . . . . . . .  25
+     A.1.  Service Models: Definition and Samples  . . . . . . . . .  25
+     A.2.  Network Models: Definitions and Samples . . . . . . . . .  26
      A.3.  Device Models: Definitions and Samples  . . . . . . . . .  28
        A.3.1.  Model Composition . . . . . . . . . . . . . . . . . .  29
-       A.3.2.  Device Models: Definitions and Samples  . . . . . . .  29
-   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  32
+       A.3.2.  Device Models: Definitions and Samples  . . . . . . .  30
+   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  33
 
 1.  Introduction
 
@@ -147,29 +147,32 @@ Internet-Draft  Service and Network Management Automation   October 2019
    organization (e.g., billing factory, design factory, network
    operation center, etc.).  In addition, many of these applications
    have been developed in-house over the years and operating in a silo
-   mode.  The lack of standard data input/output (i.e., data model) also
-   raises many challenges in system integration and often results in
-   manual configuration tasks.  Secondly, many current service
-   fulfillment might not support real time streaming telemetry
-   capability in high frequency and in high throughput on the current
-   state of networking and therefore have slow response to the network
-   changes.  Software Defined Networking (SDN) becomes crucial to
-   address these challenges.
+   mode:
 
-   Software-Defined Networking techniques [RFC7149] are meant to
-   automate the overall service delivery procedures and typically rely
-   upon (standard) data models that are used to not only reflect service
-   providers'savoir-faire but also to dynamically instantiate and
-   enforce a set of (service-inferred) policies that best accommodate
-   what has been (contractually) defined (and possibly negotiated) with
+   o  The lack of standard data input/output (i.e., data model) also
+      raises many challenges in system integration and often results in
+      manual configuration tasks.
+
+   o  Secondly, many current service fulfillment might not support real
+      time streaming telemetry capability in high frequency and in high
+      throughput on the current state of networking and therefore have
+      slow response to the network changes.
+
+   Software Defined Networking (SDN) becomes crucial to address these
+   challenges.  SDN techniques [RFC7149] are meant to automate the
+   overall service delivery procedures and typically rely upon
+   (standard) data models that are used to not only reflect service
 
 
 
-Wu, et al.               Expires April 11, 2020                 [Page 3]
+Wu, et al.               Expires April 12, 2020                 [Page 3]
 
 Internet-Draft  Service and Network Management Automation   October 2019
 
 
+   providers'savoir-faire but also to dynamically instantiate and
+   enforce a set of (service-inferred) policies that best accommodate
+   what has been (contractually) defined (and possibly negotiated) with
    the customer.  [RFC7149] provides a first tentative to rationalize
    that service provider's view on the SDN space by identifying concrete
    technical domains that need to be considered and for which solutions
@@ -193,50 +196,48 @@ Internet-Draft  Service and Network Management Automation   October 2019
 
    Models are key for each of these technical items.  Service and
    network management automation is an important step to improve the
-   agility of network operations and infrastructures.
+   agility of network operations and infrastructures.  Models are also
+   important to ease integrating multi-vendor solutions.
 
    YANG module developers have taken both top-down and bottom-up
-   approaches to develop modules [RFC8199] and to establish a mapping
-   between network technology and customer requirements on the top or
-   abstracting common construct from various network technologies on the
-   bottom.  At the time of writing this document (2019), there are many
-   data models including configuration and service models that have been
-   specified or are being specified by the IETF.  They cover many of the
-   networking protocols and techniques.  However, how these models work
-   together to configure a device, manage a set of devices involved in a
-   service, or even provide a service is something that is not currently
-   documented either within the IETF or other SDOs (e.g., MEF).
+   approaches to develop modules [RFC8199], and also to establish a
+   mapping between network technology and customer requirements on the
+   top or abstracting common construct from various network technologies
+   on the bottom.  At the time of writing this document (2019), there
+   are many data models including configuration and service models that
+   have been specified or are being specified by the IETF.  They cover
+   many of the networking protocols and techniques.  However, how these
+   models work together to configure a device, manage a set of devices
+   involved in a service, or even provide a service is something that is
+   not currently documented either within the IETF or other SDOs (e.g.,
+   MEF).
 
    This document provides a framework that describes and discusses an
    architecture for service and network management automation that takes
    advantage of YANG modeling technologies and investigates how
    different layer YANG data models interact with each other (e.g.,
    service mapping, model composing) in the context of service delivery
-   and fulfillment.  This framework is drawn from a network provider
-   perspective irrespective of the origin of a data module andcan
-   accommodate even modules that are developed outside the IETF.
-
-   The document also identifies a list of use cases to exemplify the
-   proposed approach, but it does not claim to be exhaustive.
+   and fulfillment.
 
 
 
-Wu, et al.               Expires April 11, 2020                 [Page 4]
+Wu, et al.               Expires April 12, 2020                 [Page 4]
 
 Internet-Draft  Service and Network Management Automation   October 2019
 
+
+   This framework is drawn from a network provider perspective
+   irrespective of the origin of a data module; it can accommodate even
+   modules that are developed outside the IETF.
+
+   The document also identifies a list of use cases to exemplify the
+   proposed approach, but it does not claim to be exhaustive.
 
    It is not the intent of this document to provide an inventory of
    tools and mechanisms used in specific network and service management
    domains; such inventory can be found in documents such as [RFC7276].
 
-1.1.  Terminology
-
-   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
-   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
-   "OPTIONAL" in this document are to be interpreted as described in BCP
-   14 [RFC2119] [RFC8174] when, and only when, they appear in all
-   capitals, as shown here.
+2.  Terminology
 
    The following terms are defined in [RFC8309][RFC8199] and are not
    redefined here:
@@ -253,57 +254,62 @@ Internet-Draft  Service and Network Management Automation   October 2019
 
    o  Network Element Module
 
-   The following terms are defined in this document as follows:
+   The document makes use of the following terms:
 
-   Network Model:  The Network Resource Module is used by a network
-      operator to allocate the resource(e.g., tunnel resource, topology
-      resource) for the service or schedule the resource to meet the
-      service requirements define in the Service Model.
+   Network Resource Model:  is used by a network operator to allocate a
+      network resource (e.g., tunnel resource, topology resource) for
+      the service or schedule the resource to meet the service
+      requirements captured in a Service Model.
 
    Device Model:  Network Element YANG data module described in
       [RFC8199].
 
-2.  Architectural Concepts
+3.  Architectural Concepts & Goals
 
-2.1.  Data Models: Layering and Representation
+3.1.  Data Models: Layering and Representation
 
    As described in [RFC8199], layering of modules allows for better
    reusability of lower-layer modules by higher-level modules while
    limiting duplication of features across layers.
 
-   The data modules developed by IETF can be classified into service
-   level, network level and device level modules.  Different service
-   level modules may rely on the same set of network level or device
+   The data modules developed by the IETF can be classified into service
+   level, network level, and device level modules.  Different service
 
 
 
-Wu, et al.               Expires April 11, 2020                 [Page 5]
+Wu, et al.               Expires April 12, 2020                 [Page 5]
 
 Internet-Draft  Service and Network Management Automation   October 2019
 
 
-   level modules.  Service level modules usually follow top down
-   approach and are mostly customer-facing modules providing a common
-   model construct for higher level network services, which can be
-   further mapped to network technology-specific modules at lower layer.
+   level modules may rely on the same set of network level or device
+   level modules.
+
+   Service level modules usually follow top down approach and are mostly
+   customer-facing modules providing a common model construct for higher
+   level network services (e.g., L3VPN), which can be further mapped to
+   network technology-specific modules at lower layer (e.g., tunnel,
+   routing, QoS, security).  For example, the service level can be used
+   to characterise the network service(s) to be ensured between service
+   nodes (ingress/egress) such as the communication scope (pipe, hose,
+   funnel, ...), the directionality, the traffic performance guarantees
+   (one-way delay (OWD), one-way loss, ...), etc.
 
    Network level modules mostly follow a bottom-up approach and are
    mainly network resource-facing modules and describe various aspects
    of a network infrastructure, including devices and their subsystems,
    and relevant protocols operating at the link and network layers
-   across multiple devices (e.g., Network topology and TE Tunnel
-   modules).
+   across multiple devices (e.g., Network topology and traffic-
+   engineering Tunnel modules).
 
-   Device level modules usually follow a bottom-up approach and are
-   mostly technology-specific modules used to realize a service.
+   Device (and function) level modules usually follow a bottom-up
+   approach and are mostly technology-specific modules used to realize a
+   service (e.g., BGP, NAT).
 
+   Each level maintains a view of the supported YANG modules provided by
+   low-levels (see for example, Appendix A).
 
-
-
-
-
-
-
+   Figure 1 illustrates the overall layering model.
 
 
 
@@ -327,28 +333,24 @@ Internet-Draft  Service and Network Management Automation   October 2019
 
 
 
-
-
-
-
-
-
-Wu, et al.               Expires April 11, 2020                 [Page 6]
+Wu, et al.               Expires April 12, 2020                 [Page 6]
 
 Internet-Draft  Service and Network Management Automation   October 2019
 
 
    +-----------------------------------------------------------------+
    | +-----------------------+                                       |
-   | |    Orchestrator       |               Hierachy Abstraction    |
+   | |    Orchestrator       |               Hierarchy Abstraction   |
    | |+---------------------+|                                       |
    | ||  Service Modeling   ||                 Service Model         |
    | |+---------------------+|               (Customer Oriented)     |
-   | |+---------------------+|             +-+3BW:100M,SLA   +-+     |
+   | |                       |               Scope: "1:1" Pipe model |
+   | |                       |                   Bidirectional       |
+   | |+---------------------+|             +-+ BW:100M,OWD   +-+     |
    | ||Service Orchestration||             | +---------------+ |     |
    | |+---------------------+|             +-+               +-+     |
-   | +-----------------------+          1.start            2.end     |
-   |                                      point             point    |
+   | +-----------------------+          1. Ingress        2. Egress  |
+   |                                                                 |
    |                                                                 |
    |                                                                 |
    | +-----------------------+                Network Model          |
@@ -372,41 +374,41 @@ Internet-Draft  Service and Network Management Automation   October 2019
    | +-----------------------+                                       |
    +-----------------------------------------------------------------+
 
-                        Layering and representation
+                   Figure 1: Layering and representation
 
-2.2.  Automation of service delivery procedures
+3.2.  Automation of Service Delivery Procedures
 
-   To dynamically provide service offerings, Service level modules can
-   be used by an operator.  One or more monolithic Service modules can
-   be used in the context of a composite service activation request
-   (e.g., delivery of a caching infrastructure over a VPN).  Such
-   modules are used to feed a decision-making intelligence to adequately
-   accommodate customer's needs.
-
-   Also, such modules may be used jointly with services that require
-   dynamic invocation.  An example is provided by the service modules
+   To dynamically offer and deliver service offerings, Service level
+   modules can be used by an operator.  One or more monolithic Service
+   modules can be used in the context of a composite service activation
+   request (e.g., delivery of a caching infrastructure over a VPN).
+   Such modules are used to feed a decision-making intelligence to
+   adequately accommodate customer's needs.
 
 
 
 
-Wu, et al.               Expires April 11, 2020                 [Page 7]
+
+Wu, et al.               Expires April 12, 2020                 [Page 7]
 
 Internet-Draft  Service and Network Management Automation   October 2019
 
 
+   Also, such modules may be used jointly with services that require
+   dynamic invocation.  An example is provided by the service modules
    defined by the DOTS WG to dynamically trigger requests to handle DDoS
    attacks [I-D.ietf-dots-signal-channel][I-D.ietf-dots-data-channel].
 
    Network level modules can be derived from service level modules and
-   used to provision, monitor, instantiate the service and provide
-   lifecycle management of network resources, e.g., expose network
+   used to provision, monitor, instantiate the service, and provide
+   lifecycle management of network resources (e.g., expose network
    resources to customers or operators to provide service fulfillment
    and assurance and allow customers or operators to dynamically adjust
    the network resources based on service requirements as described in
    service level modules and the current network performance information
-   described in the Northbound telemetry modules.
+   described in the telemetry modules).
 
-2.3.  Service Fullfillment Automation
+3.3.  Service Fullfillment Automation
 
    To operate the service, Device level modules derived from Service
    level modules or Network level modules can be used to provision each
@@ -418,42 +420,44 @@ Internet-Draft  Service and Network Management Automation   October 2019
    effect together with statistics should be exposed to upper layers to
    provide better network visibility (and assess to what extent the
    derived low level modules are consistent with the upper level
-   inputs).  Note that it is important to relate telemetry data with
-   configuration data to used closed loops at the different stages of
-   service delivery, from resource allocation to service operation, in
-   particular.
+   inputs).
 
-2.4.  YANG Models Integration
+   Note that it is important to correlate telemetry data with
+   configuration data to be used for closed loops at the different
+   stages of service delivery, from resource allocation to service
+   operation, in particular.
 
-   To support top-down service delivery, YANG models at different level
+3.4.  YANG Modules Integration
+
+   To support top-down service delivery, YANG modules at different level
    or at the same level need to be integrated together to enable
-   function, feature in the network device and get network setup, e.g.,
-   the service parameters captured in service level model needs to be
-   decomposed into a set of configuration parameters that may be
-   specific to one or more technologies; these technology-specific
-   parameters are grouped together per technique to define technology-
-   specific device level models or network level models.
+   function, feature in the network device and get network setup.  For
+   example, the service parameters captured in service level modules
+   need to be decomposed into a set of (configuration/notification)
+   parameters that may be specific to one or more technologies; these
+   technology-specific parameters are grouped together to define
+   technology-specific device level models or network level models.
 
    In addition, these technology-specific device level models or network
    level models can be further integrated with each other using schema
-   mount mechanism to provision each involved network function/device or
-   each involved administrative domain to support newly added module or
-   features.  A collecton of device model integreated together can be
-   loaded and validated during implementation time.
+   mount mechanism [RFC8528] to provision each involved network
+   function/device or each involved administrative domain to support
 
 
 
-
-
-Wu, et al.               Expires April 11, 2020                 [Page 8]
+Wu, et al.               Expires April 12, 2020                 [Page 8]
 
 Internet-Draft  Service and Network Management Automation   October 2019
 
 
-   Policies provide a higher layer of abstraction.  Policy model can be
-   defined at service level, network level, device level to provide
-   policy based management and telemetry automation,e.g., telemetry data
-   can trigger to generate a new policy that capture new network service
+   newly added module or features.  A collection of device models
+   integrated together can be loaded and validated during implementation
+   time.
+
+   Policies provide a higher layer of abstraction.  Policy models can be
+   defined at service level, network level, or device level to provide
+   policy-based management and telemetry automation,e.g., telemetry data
+   can trigger a new policy that captures new network service
    requirements.
 
    Performance measurement telemetry can be used to provide service
@@ -462,12 +466,10 @@ Internet-Draft  Service and Network Management Automation   October 2019
    service level model to monitor network performance or service level
    agreement.
 
-3.  Architecture Overview
+4.  Architecture Overview
 
-   The architectural considerations described in the previous section
-   lead to the architecture described in this section and illustrated in
-   Figure 1.
-
+   The architectural considerations described in Section 3 lead to the
+   architecture described in this section and illustrated in Figure 2.
 
 
 
@@ -499,9 +501,7 @@ Internet-Draft  Service and Network Management Automation   October 2019
 
 
 
-
-
-Wu, et al.               Expires April 11, 2020                 [Page 9]
+Wu, et al.               Expires April 12, 2020                 [Page 9]
 
 Internet-Draft  Service and Network Management Automation   October 2019
 
@@ -516,7 +516,7 @@ Internet-Draft  Service and Network Management Automation   October 2019
                     |        |Diff                |               V
      Multi-layer    |        |         E2E        |        E2E
      Multi-domain   |        |       Service      |       Service
-     Service Mapping|        +------ Assurance ---+      Decommision
+     Service Mapping|        +------ Assurance ---+      Decommission
                     |                     ^
                     |<-----------------+  |
      Network level  |                  |  +----+
@@ -528,95 +528,104 @@ Internet-Draft  Service and Network Management Automation   October 2019
                     |        |Diff             |  |       Specific
                     |        |     Specific----+  |       Service
            Service  |        |      Service       |     Decommission
-        Decomposing |        +------Assuance -----+
+        Decomposing |        +------Assurance -----+
                     |                  ^
                     |                  |    Aggregation
      Device level   |                  +------------+
    ------------     V                               |
    Service      Intent                         Operational
-   Fullfillment Config  ------> Config   ----> State      -->Fault
+   Fulfillment  Config  ------> Config   ----> State      -->Fault
                 Provision       Validate       Telemetry   Diagnostic
 
-            Figure 1: Service and Network Lifecycle Management
+            Figure 2: Service and Network Lifecycle Management
 
-3.1.  Service Lifecycle management Procedure
+4.1.  Service Lifecycle Management Procedure
 
    Service lifecycle management includes end to end service lifecycle
    management at the service level and specific network lifecycle
-   management at the network level.  The end to end service lifecycle
+   management at the network level.  The end-to-end service lifecycle
    management is multi-domain or multi-layer service management while
    specific service lifecycle management is domain specific or layer
    specific service lifecycle management.
 
-3.1.1.  Service Exposure
+   o  Note: Clarify what is meant by "domain".
+
+
+
+
+
+
+
+
+Wu, et al.               Expires April 12, 2020                [Page 10]
+
+Internet-Draft  Service and Network Management Automation   October 2019
+
+
+4.1.1.  Service Exposure
 
    A service in the context of this document (sometimes called a Network
    Service) is some form of connectivity between customer sites and the
    Internet or between customer sites across the network operator's
    network and across the Internet.
 
-
-
-Wu, et al.               Expires April 11, 2020                [Page 10]
-
-Internet-Draft  Service and Network Management Automation   October 2019
-
-
    Service exposure is used to capture services offered to customers
    (ordering and order handling).  One typical example is that a
    customer can use a L3SM service model to request L3VPN service by
    providing the abstract technical characterization of the intended
-   service.
+   service between cutsomer sites.
 
    Service model catalogs can be created along to expose the various
    services and the information needed to invoke/order a given service.
 
-3.1.2.  Service Creation/Modification
+4.1.2.  Service Creation/Modification
 
-   A customer is unaware of the technology that the network operator has
-   available to deliver the service, so the customer does not make
-   requests specific to the underlying technology but is limited to
-   making requests specific to the service that is to be delivered.
-   This service request can be issued using the service model
+   A customer is (usually) unaware of the technology that the network
+   operator has available to deliver the service, so the customer does
+   not make requests specific to the underlying technology but is
+   limited to making requests specific to the service that is to be
+   delivered.  This service request can be issued using the service
+   model.
 
-   The orchestrator/management system must map such service request to
-   its view.  This view can be described as a network model and this
+   The service orchestrator/management system maps such service request
+   to its view.  This view can be described as a network model and this
    mapping may include a choice of which networks and technologies to
    use depending on which service features have been requested.
 
-   In addition, a customer may require to change underlying nework
+   In addition, a customer may require to change underlying network
    infrastructure to adapt to new customer's needs and service
-   requirements.  This service modfication can be issued in the same
+   requirements.  This service modification can be issued in the same
    service model used by the service request.
 
-3.1.3.  Service optimization
+4.1.3.  Service Optimization
 
    Service optimization is a technique that gets the configuration of
-   the network updated due to network change, incident mitigation, new
-   service requirements.  One typical example is once the tunnel or the
-   VPN is setup, Performance monitoring information or telemetry
+   the network updated due to network change, incident mitigation, or
+   new service requirements.  One typical example is once the tunnel or
+   the VPN is setup, Performance monitoring information or telemetry
    information per tunnel or per VPN can be collected and fed into the
    management system, if the network performance doesn't meet the
    service requirements, the management system can create new VPN
    policies capturing network service requirements and populate them
-   into the network.  Both network performance information and VPN
-   policies can be modelled using YANG.  With Policy based mangement,
-   self configuration and self optimization behavior can be specified
-   and implemented.
-
-3.1.4.  Service Diagnosis
-
-   Operations, Administration, and Maintenance (OAM) are important
-   networking functions for service diagnosis that allow operators to:
+   into the network.
 
 
 
 
 
-Wu, et al.               Expires April 11, 2020                [Page 11]
+Wu, et al.               Expires April 12, 2020                [Page 11]
 
 Internet-Draft  Service and Network Management Automation   October 2019
 
+
+   Both network performance information and policies can be modelled
+   using YANG.  With Policy-based management, self-configuration and
+   self-optimization behavior can be specified and implemented.
+
+4.1.4.  Service Diagnosis
+
+   Operations, Administration, and Maintenance (OAM) are important
+   networking functions for service diagnosis that allow operators to:
 
    o  monitor network communications (i.e., reachability verification
       and Continuity Check)
@@ -626,9 +635,9 @@ Internet-Draft  Service and Network Management Automation   October 2019
    o  monitor service-level agreements and performance (i.e.,
       performance management)
 
-   When the network gets down, service diagnosis should be in place to
-   pinpoint the problem and provide recommendation for the network
-   recovery.
+   When the network is down, service diagnosis should be in place to
+   pinpoint the problem and provide recommendation (or instructions) for
+   the network recovery.
 
    The service diagnosis information can be modelled as technology-
    independent RPC operations for OAM protocols and technology-
@@ -637,16 +646,16 @@ Internet-Draft  Service and Network Management Automation   October 2019
    configuration, reporting, and presentation for the OAM mechanisms
    used to manage the network.
 
-3.1.5.  Service Decomission
+4.1.5.  Service Decommission
 
-   Service decommision allow the customer to stop the service and remove
-   the service from active status and release the network resource that
-   is allocated to the service.  Customer can also use the service model
-   to delete the service.
+   Service decommission allow the customer to stop the service and
+   remove the service from active status and release the network
+   resource that is allocated to the service.  Customer can also use the
+   service model to withdraw the subscription to a service.
 
-3.2.  Service Fullfillment management Procedure
+4.2.  Service Fullfillment Management Procedure
 
-3.2.1.  Intended Configuration provision
+4.2.1.  Intended Configuration Provision
 
    Intended configuration at the device level is derived from network
    model at the network level or service model at the service level and
@@ -654,25 +663,22 @@ Internet-Draft  Service and Network Management Automation   October 2019
    L3SM service model as an example, to deliver a L3VPN service, we need
    to map L3VPN service view defined in Service model into detailed
    intended configuration view defined by specific configuration models
-   for network elements, configuartion information includes:
+   for network elements, configuration information includes:
 
    o  VRF definition, including VPN Policy expression
 
-   o  Physical Interface
-
-   o  IP layer (IPv4, IPv6).
-
-   o  QoS features such as classification, profiles, etc.
 
 
-
-
-
-
-Wu, et al.               Expires April 11, 2020                [Page 12]
+Wu, et al.               Expires April 12, 2020                [Page 12]
 
 Internet-Draft  Service and Network Management Automation   October 2019
 
+
+   o  Physical Interface
+
+   o  IP layer (IPv4, IPv6)
+
+   o  QoS features such as classification, profiles, etc.
 
    o  Routing protocols: support of configuration of all protocols
       listed in the document, as well as routing policies associated
@@ -682,72 +688,103 @@ Internet-Draft  Service and Network Management Automation   October 2019
 
    o  NAT or address sharing
 
-   o  Securfity function.
+   o  Security function
 
    This specific configuration models can be used to configure PE and CE
-   devices within the site, e.g., A BGP policy model is used to
+   devices within the site, e.g., A BGP policy model can be used to
    establish VPN membership between sites and VPN Service Topology.
 
-3.2.2.  Configuration Validation
+4.2.2.  Configuration Validation
 
-   Configuraton validation is used to validate intended configuration
-   and make sure the configuration take effect.  One example is a client
+   Configuration validation is used to validate intended configuration
+   and ensure the configuration take effect.  For example, a customer
    creates an interface "et-0/0/0" but the interface does not physically
-   exist at this point, then configurfation data appears in the
-   <intended> but does not appear in <operational> datastore.
+   exist at this point, then configuration data appears in the
+   <intended> status but does not appear in <operational> datastore.
 
-3.2.3.  Operational state telemetry
+4.2.3.  Operational State Telemetry
 
    <operational> datastore holds the complete operational state of the
-   device including learned, system, default configuraton and system
+   device including learned, system, default configuration and system
    state. <operational> datastore can be used as telemetry data source
    and allows the client subscribe to updates of a YANG datastore.
+
    Based on criteria negotiated as part of a subscription, updates will
    be pushed to targeted recipients using YANG push mechanism [RFC8641].
 
-3.2.4.  Fault Diagnostic
+4.2.4.  Fault Diagnostic
 
    Technology-dependent nodes and remote procedure call (RPC) commands
-   are defined in technology- specific YANG data models which use and
-   extend the base model described in Section 3.1.4.
+   are defined in technology-specific YANG modules which use and extend
+   the base model described in Section 4.1.4.
 
-   These RPC command recieved in the technology dependent node can be
+   These RPC commands received in the technology dependent node can be
    used to trigger technology specific OAM message exchange for fault
    verification and fault isolation.
 
-3.3.  Multi-layer/Multi-domain Service Mapping
+
+
+
+Wu, et al.               Expires April 12, 2020                [Page 13]
+
+Internet-Draft  Service and Network Management Automation   October 2019
+
+
+4.3.  Multi-layer/Multi-domain Service Mapping
 
    Multi-layer/Multi-domain Service Mapping allow you map end to end
    abstract view of the service segmented at different layer or
    different administrative domain into domain specific view.  One
    example is to map service parameters in L3VPN service model into
-   configuration parameters such as RD, RT, VRF in L3VPN network model.
+   configuration parameters such as RD, RT, and VRF in L3VPN network
+   model.  Another example is to map service parameters in L3VPN service
+   model into TE tunnel parameter (e.g.,Tunnel ID) in TE model and VN
+   parameters (e.g., AP list, VN member) in TEAS VN model [I-D.ietf-
+   teas-actn-vn-yang].
+
+4.4.  Service Decomposing
+
+   Service Decomposing allows to decompose service model at the service
+   level or network model at the network level into a set of device/
+   function models at the device level.  These device models may be tied
+   to specific device type or classified into a collection of related
+   YANG modules based on service type and feature offered and load at
+   the implementation time before configuration is loaded and validated.
+
+5.  YANG Data Model Integration Examples
+
+5.1.  L3VPN Service Delivery
 
 
 
-Wu, et al.               Expires April 11, 2020                [Page 13]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Wu, et al.               Expires April 12, 2020                [Page 14]
 
 Internet-Draft  Service and Network Management Automation   October 2019
 
-
-   Another example is map service parameters in L3VPN service model into
-   TE tunnel parameter (e.g.,Tunnel ID) in TE model and VN
-   parameters(e.g., AP list, VN member) in TEAS VN model [I-D.ietf-teas-
-   actn-vn-yang].
-
-3.4.  Service Decomposing
-
-   Service Decomposing allow you to decompose service model at the
-   service level or network model at the network level into a set of
-   device configuration models at the device level.  These device models
-   may be tied to specific device type or classified into a collection
-   of related YANG modules based on service type and feature offered and
-   load at the implementation time before configuration is loaded and
-   validated.
-
-4.  YANG Data Model integration Examples
-
-4.1.  L3VPN Service Delivery
 
                  L3SM    |
                Service   |
@@ -777,17 +814,11 @@ Internet-Draft  Service and Network Management Automation   October 2019
     | CE1 |------| PE1 |      | PE2 |  ---------+ CE2 |
     +-----+      +-----+      +-----+           +-----+
 
-                      L3VPN Service Delivery Example
+                 Figure 3: L3VPN Service Delivery Example
 
-
-
-Wu, et al.               Expires April 11, 2020                [Page 14]
-
-Internet-Draft  Service and Network Management Automation   October 2019
-
-
-   The following steps are performed to deliver the service within the
-   network management automation architecture proposed in this document:
+   In reference to Figure 3, the following steps are performed to
+   deliver the L3VPN service within the network management automation
+   architecture defined in this document:
 
    1.  Customer Requests to create two sites based on L3SM Service model
        with each having one network access connectivity:
@@ -798,34 +829,42 @@ Internet-Draft  Service and Network Management Automation   October 2019
           Site B: Network-Access B, Bandwidth=30M, for class "foo1",
           guaranteed-bw-percent = 15, One-Way-Delay=60 msec
 
-   2.  The Orchestrator takes servie parameters in the L3SM model as
-       input and translating them to an orchestrated configuration of
-       network elements (e.g.,RD,RT, VRF,etc) that is part of the L3NM
-       network model.
+   2.  The Orchestrator extracts the service parameters from the L3SM
+       model.  Then, it uses them as input to translate them into an
+       orchestrated configuration of network elements (e.g., RD, RT,
+       VRF, etc.) that is part of the L3NM network model.
+
+
+
+
+Wu, et al.               Expires April 12, 2020                [Page 15]
+
+Internet-Draft  Service and Network Management Automation   October 2019
+
 
    3.  The Controller takes orchestrated configuration parameters in the
-       L3NM network model and translate them into orchestrated
+       L3NM network model and translates them into orchestrated
        configuration of network elements that is part of BGP model, QoS
        model, Network Instance model, IP management model, interface
-       model,etc.
+       model, etc.
 
-4.2.  VN lifecycle management Example
+5.2.  VN Lifecycle Management Example
 
                            |
                     VN     |
                    Service |
                    Model   |
     +------------------- --|--------------------------+
-    | Orchestrator(MDSC)   |                          |
+    | Orchestrator         |                          |
     |             +--------V--------+   +----------+  |
     |             | Service Mapping | +-+ECA Engine|  |
     |             +-----------------+ | +--------^-+  |
     +----------------------+----------+----------+----+
-                   TE      |     ECA  |  NBI Telemetry
-                  Tunnel   |    Policy|   Model  |
+                   TE      |     ECA  |     Telemetry
+                  Tunnel   |    Policy|        Model
                   Model    |          |          |
     +----------------------V----------V----------+----+
-    | Controller(PNC)                                 |
+    | Controller                                      |
     |                                                 |
     +-------------------------------------------------+
 
@@ -833,39 +872,40 @@ Internet-Draft  Service and Network Management Automation   October 2019
     | CE1 |------| PE1 |        | PE2 |---------+ CE2 |
     +-----+      +-----+        +-----+         +-----+
 
+                                 Figure 4
+
+   In reference to Figure 4, the following steps are performed to
+   deliver the VN service within the network management automation
+   architecture defined in this document:
+
+   1.  Customer requests to create 'VN' based on Access point,
+       association between VN and Access point, VN member defined in the
+       VN YANG module.
+
+   2.  The orchestrator creates the single abstract node topology based
+       on the information captured in an VN YANG module.
+
+   3.  The Customer exchanges connectivity-matrix on abstract node and
+       explicit path using TE topology model with the orchestrator.
+       This information can be used to instantiate VN and setup tunnels
+       between source and destination endpoints.
 
 
 
 
-Wu, et al.               Expires April 11, 2020                [Page 15]
+Wu, et al.               Expires April 12, 2020                [Page 16]
 
 Internet-Draft  Service and Network Management Automation   October 2019
 
 
-   The following steps are performed to deliver the VN service within
-   the network management automation architecture proposed in this
-   document:
+   4.  The telemetry which augments the TEAS VN model and corresponding
+       TE Tunnel model can be used to notify all the parameter changes
+       and network performance change related to VN topology or Tunnel
+       [I-D.ietf-teas-actn-pm-telemetry-autonomics].  This information
+       can be further used as input to ECA engine in the orchestrator
+       and generate ECA policy model to optimize the network.
 
-   1.  Customer requests to create VN based on Acces point, association
-       between VN and Access point, VN member defined in VN YANG model.
-
-   2.  The orchestrator creates the single abstract node topology based
-       VN YANG model
-
-   3.  Customer exchange connectivity-matrix on abstract node and
-       explicit path using TE topology model with the orchestrator.
-       These information can be used to instantiate VN and setup tunnels
-       between source endpoint and destination endpoint.
-
-   4.  The NBI telemetry which augment The TEAS VN model and
-       corresponding TE Tunnel model can be used to notify all the
-       parameter changes and network performance change related to VN
-       topology or TunnelI-D.ietf-teas-actn-pm-telemetry-autonomics].
-       These information can be further used as input to ECA engine in
-       the orchestrator and generate ECA policy model to optimize the
-       network.
-
-5.  Security Considerations
+6.  Security Considerations
 
    Security considerations specific to each of the technologies and
    protocols listed in the document are discussed in the specification
@@ -881,24 +921,15 @@ Internet-Draft  Service and Network Management Automation   October 2019
 
    o  ...tbc
 
-6.  IANA Considerations
+7.  IANA Considerations
 
    There are no IANA requests or assignments included in this document.
 
-7.  Acknowledgements
+8.  Acknowledgements
 
-   Thanks to Joe Clark and Greg Mirsky ,Shunsuke Homma for the review.
+   Thanks to Joe Clark, Greg Mirsky, and Shunsuke Homma for the review.
 
-
-
-
-
-Wu, et al.               Expires April 11, 2020                [Page 16]
-
-Internet-Draft  Service and Network Management Automation   October 2019
-
-
-8.  Informative References
+9.  Informative References
 
    [I-D.arkko-arch-virtualization]
               Arkko, J., Tantsura, J., Halpern, J., and B. Varga,
@@ -915,6 +946,13 @@ Internet-Draft  Service and Network Management Automation   October 2019
               Clarke, J. and B. Claise, "YANG module for
               yangcatalog.org", draft-clacla-netmod-model-catalog-03
               (work in progress), April 2018.
+
+
+
+Wu, et al.               Expires April 12, 2020                [Page 17]
+
+Internet-Draft  Service and Network Management Automation   October 2019
+
 
    [I-D.homma-slice-provision-models]
               Homma, S., Nishihara, H., Miyasaka, T., Galis, A., OV, V.,
@@ -946,14 +984,6 @@ Internet-Draft  Service and Network Management Automation   October 2019
               Detection (BFD)", draft-ietf-bfd-yang-17 (work in
               progress), August 2018.
 
-
-
-
-Wu, et al.               Expires April 11, 2020                [Page 17]
-
-Internet-Draft  Service and Network Management Automation   October 2019
-
-
    [I-D.ietf-ccamp-alarm-module]
               Vallin, S. and M. Bjorklund, "YANG Alarm Module", draft-
               ietf-ccamp-alarm-module-09 (work in progress), April 2019.
@@ -969,6 +999,16 @@ Internet-Draft  Service and Network Management Automation   October 2019
               Y. Lee, "YANG data model for Flexi-Grid Optical Networks",
               draft-ietf-ccamp-flexigrid-yang-04 (work in progress),
               July 2019.
+
+
+
+
+
+
+Wu, et al.               Expires April 12, 2020                [Page 18]
+
+Internet-Draft  Service and Network Management Automation   October 2019
+
 
    [I-D.ietf-ccamp-l1csm-yang]
               Lee, Y., Lee, K., Zheng, H., Dhody, D., Dios, O., and D.
@@ -1000,16 +1040,6 @@ Internet-Draft  Service and Network Management Automation   October 2019
               Tunnel", draft-ietf-ccamp-wson-tunnel-model-04 (work in
               progress), September 2019.
 
-
-
-
-
-
-Wu, et al.               Expires April 11, 2020                [Page 18]
-
-Internet-Draft  Service and Network Management Automation   October 2019
-
-
    [I-D.ietf-dots-data-channel]
               Boucadair, M. and R. K, "Distributed Denial-of-Service
               Open Threat Signaling (DOTS) Data Channel Specification",
@@ -1026,6 +1056,15 @@ Internet-Draft  Service and Network Management Automation   October 2019
               Jethanandani, M., Patel, K., Hares, S., and J. Haas, "BGP
               YANG Model for Service Provider Networks", draft-ietf-idr-
               bgp-model-07 (work in progress), October 2019.
+
+
+
+
+
+Wu, et al.               Expires April 12, 2020                [Page 19]
+
+Internet-Draft  Service and Network Management Automation   October 2019
+
 
    [I-D.ietf-ippm-stamp-yang]
               Mirsky, G., Xiao, M., and W. Luo, "Simple Two-way Active
@@ -1056,16 +1095,6 @@ Internet-Draft  Service and Network Management Automation   October 2019
               draft-ietf-pim-igmp-mld-yang-15 (work in progress), June
               2019.
 
-
-
-
-
-
-Wu, et al.               Expires April 11, 2020                [Page 19]
-
-Internet-Draft  Service and Network Management Automation   October 2019
-
-
    [I-D.ietf-pim-yang]
               Liu, X., McAllister, P., Peter, A., Sivakumar, M., Liu,
               Y., and f. hu, "A YANG Data Model for Protocol Independent
@@ -1081,6 +1110,17 @@ Internet-Draft  Service and Network Management Automation   October 2019
               Qu, Y., Tantsura, J., Lindem, A., and X. Liu, "A YANG Data
               Model for Routing Policy Management", draft-ietf-rtgwg-
               policy-model-07 (work in progress), September 2019.
+
+
+
+
+
+
+
+Wu, et al.               Expires April 12, 2020                [Page 20]
+
+Internet-Draft  Service and Network Management Automation   October 2019
+
 
    [I-D.ietf-softwire-iftunnel]
               Boucadair, M., Farrer, I., and R. Asati, "Tunnel Interface
@@ -1114,14 +1154,6 @@ Internet-Draft  Service and Network Management Automation   October 2019
               YANG Model", draft-ietf-teas-sf-aware-topo-model-03 (work
               in progress), March 2019.
 
-
-
-
-Wu, et al.               Expires April 11, 2020                [Page 20]
-
-Internet-Draft  Service and Network Management Automation   October 2019
-
-
    [I-D.ietf-teas-te-service-mapping-yang]
               Lee, Y., Dhody, D., Fioccola, G., WU, Q., Ceccarelli, D.,
               and J. Tantsura, "Traffic Engineering (TE) and Service
@@ -1138,6 +1170,13 @@ Internet-Draft  Service and Network Management Automation   October 2019
               Busi, I. and S. Belotti, "Yang model for requesting Path
               Computation", draft-ietf-teas-yang-path-computation-06
               (work in progress), July 2019.
+
+
+
+Wu, et al.               Expires April 12, 2020                [Page 21]
+
+Internet-Draft  Service and Network Management Automation   October 2019
+
 
    [I-D.ietf-teas-yang-rsvp-te]
               Beeram, V., Saad, T., Gandhi, R., Liu, X., Bryskin, I.,
@@ -1167,17 +1206,6 @@ Internet-Draft  Service and Network Management Automation   October 2019
               Networks (VPNs)", RFC 4364, DOI 10.17487/RFC4364, February
               2006, <https://www.rfc-editor.org/info/rfc4364>.
 
-
-
-
-
-
-
-Wu, et al.               Expires April 11, 2020                [Page 21]
-
-Internet-Draft  Service and Network Management Automation   October 2019
-
-
    [RFC4664]  Andersson, L., Ed. and E. Rosen, Ed., "Framework for Layer
               2 Virtual Private Networks (L2VPNs)", RFC 4664,
               DOI 10.17487/RFC4664, September 2006,
@@ -1196,6 +1224,15 @@ Internet-Draft  Service and Network Management Automation   October 2019
    [RFC5880]  Katz, D. and D. Ward, "Bidirectional Forwarding Detection
               (BFD)", RFC 5880, DOI 10.17487/RFC5880, June 2010,
               <https://www.rfc-editor.org/info/rfc5880>.
+
+
+
+
+
+Wu, et al.               Expires April 12, 2020                [Page 22]
+
+Internet-Draft  Service and Network Management Automation   October 2019
+
 
    [RFC7149]  Boucadair, M. and C. Jacquenet, "Software-Defined
               Networking: A Perspective from within a Service Provider
@@ -1226,14 +1263,6 @@ Internet-Draft  Service and Network Management Automation   October 2019
               Classification", RFC 8199, DOI 10.17487/RFC8199, July
               2017, <https://www.rfc-editor.org/info/rfc8199>.
 
-
-
-
-Wu, et al.               Expires April 11, 2020                [Page 22]
-
-Internet-Draft  Service and Network Management Automation   October 2019
-
-
    [RFC8299]  Wu, Q., Ed., Litkowski, S., Tomotaki, L., and K. Ogaki,
               "YANG Data Model for L3VPN Service Delivery", RFC 8299,
               DOI 10.17487/RFC8299, January 2018,
@@ -1253,6 +1282,13 @@ Internet-Draft  Service and Network Management Automation   October 2019
               Ananthakrishnan, H., and X. Liu, "A YANG Data Model for
               Network Topologies", RFC 8345, DOI 10.17487/RFC8345, March
               2018, <https://www.rfc-editor.org/info/rfc8345>.
+
+
+
+Wu, et al.               Expires April 12, 2020                [Page 23]
+
+Internet-Draft  Service and Network Management Automation   October 2019
+
 
    [RFC8346]  Clemm, A., Medved, J., Varga, R., Liu, X.,
               Ananthakrishnan, H., and N. Bahadur, "A YANG Data Model
@@ -1280,16 +1316,6 @@ Internet-Draft  Service and Network Management Automation   October 2019
               DOI 10.17487/RFC8513, January 2019,
               <https://www.rfc-editor.org/info/rfc8513>.
 
-
-
-
-
-
-Wu, et al.               Expires April 11, 2020                [Page 23]
-
-Internet-Draft  Service and Network Management Automation   October 2019
-
-
    [RFC8519]  Jethanandani, M., Agarwal, S., Huang, L., and D. Blair,
               "YANG Data Model for Network Access Control Lists (ACLs)",
               RFC 8519, DOI 10.17487/RFC8519, March 2019,
@@ -1308,6 +1334,17 @@ Internet-Draft  Service and Network Management Automation   October 2019
               Liu, "YANG Model for Logical Network Elements", RFC 8530,
               DOI 10.17487/RFC8530, March 2019,
               <https://www.rfc-editor.org/info/rfc8530>.
+
+
+
+
+
+
+
+Wu, et al.               Expires April 12, 2020                [Page 24]
+
+Internet-Draft  Service and Network Management Automation   October 2019
+
 
    [RFC8531]  Kumar, D., Wu, Q., and Z. Wang, "Generic YANG Data Model
               for Connection-Oriented Operations, Administration, and
@@ -1338,14 +1375,6 @@ A.1.  Service Models: Definition and Samples
    across the network operator's network and across the Internet".  More
    concretely, an IP connectivity service can be defined as the IP
    transfer capability characterized by a (Source Nets, Destination
-
-
-
-Wu, et al.               Expires April 11, 2020                [Page 24]
-
-Internet-Draft  Service and Network Management Automation   October 2019
-
-
    Nets, Guarantees, Scope) tuple where "Source Nets" is a group of
    unicast IP addresses, "Destination Nets" is a group of IP unicast
    and/or multicast addresses, and "Guarantees" reflects the guarantees
@@ -1365,9 +1394,17 @@ Internet-Draft  Service and Network Management Automation   October 2019
       generally applicable to any mode of Virtual Network (VN)
       operation.
 
+
+
+
+Wu, et al.               Expires April 12, 2020                [Page 25]
+
+Internet-Draft  Service and Network Management Automation   October 2019
+
+
 A.2.  Network Models: Definitions and Samples
 
-   Figure 2 depicts a set of Network models such as topology models or
+   Figure 5 depicts a set of Network models such as topology models or
    tunnel models:
 
                         |                             |
@@ -1390,17 +1427,9 @@ A.2.  Network Models: Definitions and Samples
         +---+L3 Topo |  |
             +--------+  |
 
-              Figure 2: Sample Resource Facing Network Models
+              Figure 5: Sample Resource Facing Network Models
 
-   Topology YANG model Examples:
-
-
-
-
-Wu, et al.               Expires April 11, 2020                [Page 25]
-
-Internet-Draft  Service and Network Management Automation   October 2019
-
+   Topology YANG module Examples:
 
    o  Network Topology Models: [RFC8345] defines a base model for
       network topology and inventories.  Network topology data include
@@ -1421,6 +1450,14 @@ Internet-Draft  Service and Network Management Automation   October 2019
       L3 Topologies.  This model is extended from the network topology
       model defined in [RFC8345] with L3 topologies specifics.
 
+
+
+
+Wu, et al.               Expires April 12, 2020                [Page 26]
+
+Internet-Draft  Service and Network Management Automation   October 2019
+
+
    o  L2 Topology Models
 
       [I.D-ietf-i2rs-yang-l2-topology] defines a data model for
@@ -1428,7 +1465,7 @@ Internet-Draft  Service and Network Management Automation   October 2019
       extended from the network topology model defined in [RFC8345] with
       L2 topologies specifics.
 
-   Tunnel YANG model Examples:
+   Tunnel YANG module Examples:
 
    o  Tunnel identities [I-D.ietf-softwire-iftunnel] to ease
       manipulating extensions to specific tunnels.
@@ -1450,14 +1487,6 @@ Internet-Draft  Service and Network Management Automation   October 2019
       model(s) and defines a YANG module for MPLS TE configurations,
       state, RPC and notifications.
 
-
-
-
-Wu, et al.               Expires April 11, 2020                [Page 26]
-
-Internet-Draft  Service and Network Management Automation   October 2019
-
-
    o  RSVP-TE MPLS Model
 
       [I.D-ietf-teas-yang-rsvp-te] augments the RSVP-TE generic module
@@ -1477,6 +1506,14 @@ Internet-Draft  Service and Network Management Automation   October 2019
 
       [RFC8532] defines a base YANG module for the management of OAM
       protocols that use Connectionless Communications.  [RFC8533]
+
+
+
+Wu, et al.               Expires April 12, 2020                [Page 27]
+
+Internet-Draft  Service and Network Management Automation   October 2019
+
+
       defines a retrieval method YANG module for connectionless OAM
       protocols.  [RFC8531] defines a base YANG module for connection
       oriented OAM protocols.  These three models are intended to
@@ -1486,7 +1523,7 @@ Internet-Draft  Service and Network Management Automation   October 2019
       Alarm monitoring is a fundamental part of monitoring the network.
       Raw alarms from devices do not always tell the status of the
       network services or necessarily point to the root cause.  [I.D-
-      ietf-ccamp-alarm-module]defines a YANG module for alarm
+      ietf-ccamp-alarm-module] defines a YANG module for alarm
       management.
 
    o  Generic Policy Model
@@ -1503,24 +1540,35 @@ Internet-Draft  Service and Network Management Automation   October 2019
       monitoring of network elements and services.  This document
       describes the SUPA basic framework, its elements, and interfaces.
 
-
-
-
-
-
-
-Wu, et al.               Expires April 11, 2020                [Page 27]
-
-Internet-Draft  Service and Network Management Automation   October 2019
-
-
 A.3.  Device Models: Definitions and Samples
 
-   Network Element models (Figure 3) are used to describe how a service
+   Network Element models (Figure 6) are used to describe how a service
    can be implemented by activating and tweaking a set of functions
    (enabled in one or multiple devices, or hosted in cloud
    infrastructures) that are involved in the service delivery.  The
    following figure uses IETF defined models as an example.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Wu, et al.               Expires April 12, 2020                [Page 28]
+
+Internet-Draft  Service and Network Management Automation   October 2019
+
 
                                           +----------------+
                                         --|Device Model    |
@@ -1561,14 +1609,7 @@ A.3.  Device Models: Definitions and Samples
          --|OSPF-SR|
            +-------+
 
-                Figure 3: Network Element Modules Overview
-
-
-
-Wu, et al.               Expires April 11, 2020                [Page 28]
-
-Internet-Draft  Service and Network Management Automation   October 2019
-
+                Figure 6: Network Element Modules Overview
 
 A.3.1.  Model Composition
 
@@ -1577,6 +1618,14 @@ A.3.1.  Model Composition
       [I.D-ietf-rtgwg-device-model] presents an approach for organizing
       YANG modules in a comprehensive logical structure that may be used
       to configure and operate network devices.  The structure is itself
+
+
+
+Wu, et al.               Expires April 12, 2020                [Page 29]
+
+Internet-Draft  Service and Network Management Automation   October 2019
+
+
       represented as an example YANG module, with all of the related
       component models logically organized in a way that is
       operationally intuitive, but this model is not expected to be
@@ -1618,20 +1667,20 @@ A.3.2.  Device Models: Definitions and Samples
               and operational aspects based on data center, carrier and
               content provider operational requirements.
 
-
-
-
-Wu, et al.               Expires April 11, 2020                [Page 29]
-
-Internet-Draft  Service and Network Management Automation   October 2019
-
-
    MPLS:      [I-D.ietf-mpls-base-yang] defines a base model for MPLS
               which serves as a base framework for configuring and
               managing an MPLS switching subsystem.  It is expected that
               other MPLS technology YANG modules (e.g.  MPLS LSP Static,
               LDP or RSVP-TE models) will augment the MPLS base YANG
               module.
+
+
+
+
+Wu, et al.               Expires April 12, 2020                [Page 30]
+
+Internet-Draft  Service and Network Management Automation   October 2019
+
 
    QoS:       [I-D.asechoud-netmod-diffserv-model] describes a YANG
               module of Differentiated Services for configuration and
@@ -1673,15 +1722,6 @@ Internet-Draft  Service and Network Management Automation   October 2019
               (IGMP) and Multicast Listener Discovery (MLD) Snooping
               devices.
 
-
-
-
-
-Wu, et al.               Expires April 11, 2020                [Page 30]
-
-Internet-Draft  Service and Network Management Automation   October 2019
-
-
    EVPN:      [I-D.ietf-bess-evpn-yang] defines a YANG module for
               Ethernet VPN services.  The model is agnostic of the
               underlay.  It apply to MPLS as well as to VxLAN
@@ -1689,6 +1729,14 @@ Internet-Draft  Service and Network Management Automation   October 2019
               including E-LAN, E-LINE and E-TREE services.  This
               document mainly focuses on EVPN and Ethernet-Segment
               instance framework.
+
+
+
+
+Wu, et al.               Expires April 12, 2020                [Page 31]
+
+Internet-Draft  Service and Network Management Automation   October 2019
+
 
    L3VPN:     [I-D.ietf-bess-l3vpn-yang] defines a YANG module that can
               be used to configure and manage BGP L3VPNs [RFC4364].  It
@@ -1730,14 +1778,6 @@ Internet-Draft  Service and Network Management Automation   October 2019
 
    PM:
 
-
-
-
-Wu, et al.               Expires April 11, 2020                [Page 31]
-
-Internet-Draft  Service and Network Management Automation   October 2019
-
-
               [I.D-ietf-ippm-twamp-yang] defines a data model for client
               and server implementations of the Two-Way Active
               Measurement Protocol (TWAMP).
@@ -1746,6 +1786,13 @@ Internet-Draft  Service and Network Management Automation   October 2019
               implementations of Session-Sender and Session-Reflector
               for Simple Two-way Active Measurement Protocol (STAMP)
               mode using YANG.
+
+
+
+Wu, et al.               Expires April 12, 2020                [Page 32]
+
+Internet-Draft  Service and Network Management Automation   October 2019
+
 
               [RFC8194] defines a data model for Large-Scale Measurement
               Platforms (LMAPs).
@@ -1783,22 +1830,24 @@ Authors' Addresses
    Email: luismiguel.contrerasmurillo@telefonica.com
 
 
-
-
-
-
-
-
-Wu, et al.               Expires April 11, 2020                [Page 32]
-
-Internet-Draft  Service and Network Management Automation   October 2019
-
-
    Diego R. Lopez
    Telefonica I+D
    Spain
 
    Email: diego.r.lopez@telefonica.com
+
+
+
+
+
+
+
+
+
+
+Wu, et al.               Expires April 12, 2020                [Page 33]
+
+Internet-Draft  Service and Network Management Automation   October 2019
 
 
    Chongfeng Xie
@@ -1845,4 +1894,11 @@ Internet-Draft  Service and Network Management Automation   October 2019
 
 
 
-Wu, et al.               Expires April 11, 2020                [Page 33]
+
+
+
+
+
+
+
+Wu, et al.               Expires April 12, 2020                [Page 34]
